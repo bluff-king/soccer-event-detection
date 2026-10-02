@@ -47,6 +47,12 @@ def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
         save_jsonl(rows, processed(cfg, f"echoes_{s}.jsonl"))
         manifest["counts"][f"echoes_{s}"] = class_counts(rows)
 
+    for s in SPLITS:  # ground-truth highlight events (for event-level evaluation)
+        evs = [{"game": g.game, "half": e.half, "cls": e.cls, "time": e.time, "label": e.label}
+               for g in b.games if g.split == s for e in g.events if e.cls and e.half in g.halves]
+        p = processed(cfg, f"events_{s}.jsonl")
+        p.write_text("".join(json.dumps(x) + "\n" for x in evs), encoding="utf-8")
+
     train_echoes = [x for x in b.samples if x.split == "train"]
     if "caption" in sources:
         caps = load_caption_samples(split_games["train"], d.get("mirror_root"), d.get("official_root"),
@@ -112,6 +118,29 @@ def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
 
 def load_split(cfg: dict, split: str) -> list[Sample]:
     return load_jsonl(processed(cfg, f"echoes_{split}.jsonl"))
+
+
+def load_events(cfg: dict, split: str):
+    from ..metrics import GTEvent
+
+    out = []
+    with processed(cfg, f"events_{split}.jsonl").open(encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                d = json.loads(line)
+                out.append(GTEvent(d["game"], d["half"], d["cls"], d["time"]))
+    return out
+
+
+def class_offsets(cfg: dict) -> dict[str, float]:
+    """Expected commentator delay per class = centre of its labelling window (used to map a detected
+    segment back to the event time)."""
+    from .build import per_class_delays
+
+    d = cfg["data"]
+    pc = per_class_delays(cfg) or {}
+    return {c: (pc.get(c, (d["delay_min"], d["delay_max"]))[0] + pc.get(c, (d["delay_min"], d["delay_max"]))[1]) / 2
+            for c in CLASSES[1:]}
 
 
 def assemble_train(cfg: dict) -> list[Sample]:
