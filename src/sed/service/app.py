@@ -2,7 +2,7 @@
 
     MODEL_DIR=outputs/baseline/best uvicorn sed.service.app:app --host 0.0.0.0 --port 8000
 
-POST /detect  {"segments": [{"start": 12.0, "end": 14.5, "text": "..."}], "thresholds": {"Goal": 0.6}}
+POST /detect  {"segments": [{"start": 12.0, "end": 14.5, "text": "...", "half": 1}], "thresholds": {"Goal": 0.6}}
 -> {"events": [{"type": "Goal", "timestamp": 790.1, "confidence": 0.93, "segment": {...}}], ...}
 """
 
@@ -22,6 +22,7 @@ class SegmentIn(BaseModel):
     start: float = Field(..., ge=0, description="segment start (s)")
     end: float = Field(..., ge=0, description="segment end (s)")
     text: str
+    half: int | None = Field(None, ge=1, le=2, description="optional half (times restart at 0 in each half)")
 
 
 class DetectRequest(BaseModel):
@@ -38,8 +39,9 @@ class SegmentOut(BaseModel):
 
 class EventOut(BaseModel):
     type: str
-    timestamp: float
+    timestamp: float = Field(..., description="estimated event time (s, within the half)")
     confidence: float
+    half: int | None = None
     segment: SegmentOut
 
 
@@ -82,5 +84,6 @@ def detect(req: DetectRequest):
         raise HTTPException(503, str(e)) from e
     t0 = time.time()
     events = det.detect([s.model_dump() for s in req.segments], req.thresholds, req.min_confidence)
+    events = [{k: v for k, v in e.items() if v is not None} for e in events]
     return DetectResponse(events=events, n_segments=len(req.segments), model=str(det.model_dir),
                           latency_ms=round((time.time() - t0) * 1000, 1))

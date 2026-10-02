@@ -29,12 +29,20 @@ class EventDetector:
 
     def detect(self, segments: list[dict], thresholds: dict[str, float] | None = None,
                min_confidence: float = 0.0) -> list[dict]:
+        """``segments``: dicts with start, end, text and optional ``half`` (1/2). Halves are processed
+        separately (context, smoothing and NMS never cross a half; times restart in each half)."""
         st = self.settings
-        windows = windows_from_transcript(segments, st["ctx_before"], st["ctx_after"])
+        windows, halves = [], []
+        for h in sorted({int(s.get("half") or 0) for s in segments}):
+            ws = windows_from_transcript([s for s in segments if int(s.get("half") or 0) == h],
+                                         st["ctx_before"], st["ctx_after"])
+            windows += ws
+            halves += [h] * len(ws)
         if not windows:
             return []
         probs = predict_probs(self.model, self.tok, windows, st["max_length"], 64, self.device)
-        meta = [{"game": "match", "half": 0, "start": w.start, "seg_idx": i} for i, w in enumerate(windows)]
+        meta = [{"game": "match", "half": h, "start": w.start, "seg_idx": i}
+                for i, (w, h) in enumerate(zip(windows, halves))]
         thr = {**st["thresholds"], **(thresholds or {})}
         dets = detect_events(meta, probs, thr, st["smoothing"], st["nms_window"], st["offsets"])
         out = []
@@ -42,15 +50,19 @@ class EventDetector:
             if d.confidence < min_confidence:
                 continue
             w = windows[d.seg_idx]
-            out.append({"type": d.cls, "timestamp": round(max(0.0, d.time), 2), "confidence": round(d.confidence, 4),
-                        "segment": {"start": w.start, "end": w.end, "text": w.text}})
-        return out
+            e = {"type": d.cls, "timestamp": round(max(0.0, d.time), 2), "confidence": round(d.confidence, 4),
+                 "segment": {"start": w.start, "end": w.end, "text": w.text}}
+            if d.half:
+                e["half"] = d.half
+            out.append(e)
+        return sorted(out, key=lambda e: (e.get("half", 0), e["timestamp"]))
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
-    ap.add_argument("--transcript", required=True, help="JSON: {segments: [{start,end,text}]} or SoccerNet-Echoes *_asr.json")
+    ap.add_argument("--transcript", required=True,
+                    help="JSON: {segments: [{start,end,text[,half]}]} or a SoccerNet-Echoes *_asr.json")
     a = ap.parse_args(argv)
     data = json.loads(Path(a.transcript).read_text())
     segs = data["segments"]

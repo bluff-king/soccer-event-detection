@@ -36,10 +36,17 @@ def test_detect_endpoint(model_dir, monkeypatch):
     body = r.json()
     assert body["n_segments"] == len(segs) and body["events"]
     e = body["events"][0]
-    assert set(e) == {"type", "timestamp", "confidence", "segment"} and e["type"] in ("Goal", "Card", "Penalty")
+    assert {"type", "timestamp", "confidence", "segment"} <= set(e) and e["type"] in ("Goal", "Card", "Penalty")
     # NMS: events of one class are at least nms_window apart (compare segment starts: timestamps are
     # clipped at 0 after subtracting the class offset)
     goals = sorted(x["segment"]["start"] for x in body["events"] if x["type"] == "Goal")
     assert all(b - a >= 30 for a, b in zip(goals, goals[1:]))
     assert client.post("/detect", json={"segments": segs, "thresholds": {"Foo": 1}}).status_code == 422
+    # two halves with restarting times are processed separately
+    two = [dict(s, half=1) for s in segs] + [dict(s, half=2) for s in segs]
+    b2 = client.post("/detect", json={"segments": two}).json()
+    assert {e["half"] for e in b2["events"]} == {1, 2}
+    for h in (1, 2):
+        g = sorted(e["segment"]["start"] for e in b2["events"] if e["type"] == "Goal" and e["half"] == h)
+        assert all(b - a >= 30 for a, b in zip(g, g[1:]))
     assert client.post("/detect", json={"segments": []}).json()["events"] == []

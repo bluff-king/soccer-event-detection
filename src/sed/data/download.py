@@ -88,11 +88,14 @@ def download_official(root: Path, splits=("train", "valid", "test")) -> None:
     from SoccerNet.Downloader import SoccerNetDownloader
 
     dl = SoccerNetDownloader(LocalDirectory=str(root / "soccernet"))
-    dl.downloadGames(files=["Labels-v2.json"], split=list(splits))
-    try:
-        dl.downloadDataTask(task="caption-2023", split=list(splits))
-    except Exception as e:  # pragma: no cover - network dependent
-        print(f"[warn] caption download failed: {e}")
+    # Recent SoccerNet versions download from Hugging Face (may need `huggingface-cli login` and accepting the
+    # dataset terms). On failure the pipeline keeps using the GitHub mirror (label_source: auto).
+    for what, fn in (("Labels-v2", lambda: dl.downloadGames(files=["Labels-v2.json"], split=list(splits))),
+                     ("Labels-caption", lambda: dl.downloadDataTask(task="caption-2023", split=list(splits)))):
+        try:
+            fn()
+        except Exception as e:  # pragma: no cover - network dependent
+            print(f"[warn] official {what} download failed ({e}); the mirror will be used")
 
 
 def main(argv=None) -> None:
