@@ -1,4 +1,4 @@
-data/
+/data/
 *.pt
 *.bin
 *.safetensors
@@ -7,3 +7,8 @@ outputs/
 __pycache__/
 .venv/
 .ipynb_checkpoints/
+*.egg-info/
+.pytest_cache/
+*.ckpt
+*.onnx
+mlruns/

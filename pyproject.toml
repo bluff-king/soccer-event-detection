@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sed"
+version = "0.1.0"
+description = "Soccer event detection (Goal/Card/Penalty) from ASR commentary transcripts"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "pandas",
+  "pyyaml",
+  "scikit-learn",
+  "matplotlib",
+  "tqdm",
+  "torch>=2.1",
+  "transformers>=4.40",
+  "sentencepiece",
+  "tokenizers",
+  "SoccerNet>=0.1.60",
+]
+
+[project.optional-dependencies]
+serve = ["fastapi", "uvicorn[standard]", "pydantic>=2"]
+dev = ["pytest", "httpx"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
