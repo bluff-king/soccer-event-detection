@@ -1,0 +1,7 @@
+# post-processing: probability smoothing (3 segments) + 45 s NMS
+_base_: ../base.yaml
+output_dir: outputs/imp_smoothing
+run_name: imp_smoothing
+postprocess:
+  smoothing: 3
+  nms_window: 45.0

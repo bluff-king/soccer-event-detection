@@ -1,0 +1,9 @@
+# Echoes + all external sources
+_base_: ../base.yaml
+output_dir: outputs/data_all
+run_name: data_all
+sources:
+  caption: {enabled: true}
+  kaggle: {enabled: true}
+  synthetic: {enabled: true}
+  hardneg: {enabled: true}

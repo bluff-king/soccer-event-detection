@@ -1,0 +1,4 @@
+# Echoes only (= baseline)
+_base_: ../base.yaml
+output_dir: outputs/data_echoes
+run_name: data_echoes

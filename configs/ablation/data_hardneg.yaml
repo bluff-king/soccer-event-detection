@@ -1,0 +1,6 @@
+# Echoes + hard negatives
+_base_: ../base.yaml
+output_dir: outputs/data_hardneg
+run_name: data_hardneg
+sources:
+  hardneg: {enabled: true}

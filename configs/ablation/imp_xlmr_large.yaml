@@ -1,0 +1,11 @@
+# backbone xlm-roberta-large (also usable as stage-2 verifier)
+_base_: ../base.yaml
+output_dir: outputs/imp_xlmr_large
+run_name: imp_xlmr_large
+model:
+  name: xlm-roberta-large
+train:
+  batch_size: 16
+  grad_accum: 2
+  lr: 1.0e-5
+  epochs: 3

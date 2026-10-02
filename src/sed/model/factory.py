@@ -32,9 +32,11 @@ def build_model_and_tokenizer(cfg: dict, train_texts: list[str] | None = None):
 
     name = cfg["model"]["name"]
     if name == "tiny-local":
-        tok = build_tiny_tokenizer(train_texts or ["goal card penalty"])
-        conf = BertConfig(vocab_size=len(tok), hidden_size=64, num_hidden_layers=2, num_attention_heads=2,
-                          intermediate_size=128, max_position_embeddings=max(512, cfg["model"]["max_length"] + 8),
+        tok = build_tiny_tokenizer(train_texts or ["goal card penalty"], cfg["model"].get("tiny_vocab", 4000))
+        h = cfg["model"].get("tiny_hidden", 64)
+        conf = BertConfig(vocab_size=len(tok), hidden_size=h, num_hidden_layers=cfg["model"].get("tiny_layers", 2),
+                          num_attention_heads=max(2, h // 64), intermediate_size=2 * h,
+                          max_position_embeddings=max(512, cfg["model"]["max_length"] + 8),
                           num_labels=len(LABEL2ID), id2label=ID2LABEL, label2id=LABEL2ID,
                           pad_token_id=tok.pad_token_id)
         return BertForSequenceClassification(conf), tok

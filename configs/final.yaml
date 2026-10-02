@@ -1,0 +1,15 @@
+# final candidate: all data + class delays + weighted CE + smoothing (edit after ablations)
+_base_: base.yaml
+output_dir: outputs/final
+run_name: final
+data:
+  delay_per_class: {Goal: [-5, 25], Card: [-15, 15], Penalty: [-60, 5]}
+sources:
+  caption: {enabled: true}
+  kaggle: {enabled: true}
+  synthetic: {enabled: true}
+  hardneg: {enabled: true}
+train:
+  loss: weighted_ce
+postprocess:
+  smoothing: 3

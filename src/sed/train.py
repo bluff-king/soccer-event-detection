@@ -48,10 +48,13 @@ def train(cfg: dict) -> dict:
 
     train_samples = assemble_train(cfg)
     valid_samples = load_split(cfg, "valid")
-    if tr.get("max_eval_samples"):  # subsample validation for fast per-epoch selection (smoke tests)
+    if tr.get("select_eval_negatives"):
+        # per-epoch model selection on all validation positives + a fixed random subset of negatives
+        # (the final evaluation always uses the full validation/test sets)
         rng = np.random.default_rng(cfg.get("seed", 42))
-        idx = rng.choice(len(valid_samples), size=min(tr["max_eval_samples"], len(valid_samples)), replace=False)
-        valid_samples = [valid_samples[i] for i in sorted(idx)]
+        neg = [i for i, s in enumerate(valid_samples) if s.label == "No-Event"]
+        keep = set(rng.choice(neg, size=min(tr["select_eval_negatives"], len(neg)), replace=False).tolist())
+        valid_samples = [s for i, s in enumerate(valid_samples) if s.label != "No-Event" or i in keep]
     labels = [s.label for s in train_samples]
     print(f"[data] train={len(train_samples)} {dict(Counter(labels))} "
           f"sources={dict(Counter(s.source for s in train_samples))} valid={len(valid_samples)}", flush=True)

@@ -22,7 +22,7 @@ data:
   ctx_before: 1
   ctx_after: 1
   # train-time negative subsampling (valid/test always keep the natural distribution)
-  train_neg_ratio: null                            # e.g. 3.0 = keep 3 No-Event per positive; null = keep all
+  train_neg_ratio: 4.0                             # keep 4 No-Event per positive (null = keep all ~380k)
   keep_keyword_negatives: true                     # never drop No-Event windows that mention goal/card/penalty
 
 sources:                                           # external data, TRAIN ONLY
@@ -60,6 +60,7 @@ train:
   sampler: none                                    # none | balanced (WeightedRandomSampler)
   max_steps: null                                  # cap steps (smoke tests)
   eval_every: null                                 # steps; null = once per epoch
+  select_eval_negatives: 30000                     # per-epoch selection: all valid positives + 30k negatives
   num_workers: 2
   select_metric: highlight_f1                      # model selection on validation
 
