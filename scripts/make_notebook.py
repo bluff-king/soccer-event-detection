@@ -1,0 +1,191 @@
+"""Generate notebooks/train_colab.ipynb (kept as code so the notebook stays reviewable in diffs).
+
+    python scripts/make_notebook.py
+"""
+
+import json
+from pathlib import Path
+
+CELLS = []
+
+
+def md(s):
+    CELLS.append({"cell_type": "markdown", "metadata": {}, "source": s.strip("\n").splitlines(True)})
+
+
+def code(s):
+    CELLS.append({"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [],
+                  "source": s.strip("\n").splitlines(True)})
+
+
+md("""
+# Commentary event detection: train & evaluate on Colab (T4)
+
+Runs end to end: clone repo, install, download public data, data survey, prepare datasets (Echoes +
+external sources), keyword reference, **baseline `xlm-roberta-base`**, data ablations, improvements,
+two-stage verification, results table, and saving to Google Drive.
+
+**Runtime → Change runtime type → T4 GPU.** Estimated times (T4, fp16) are given in each section.
+Every run writes `outputs/<run>/summary.json`; finished runs are skipped when re-run, so a disconnected
+session can resume (outputs are synced to Drive if `USE_DRIVE=True`).
+""")
+
+code("""
+# ---- settings -------------------------------------------------------------
+REPO_URL = "https://github.com/bluff-king/soccer-event-detection"
+BRANCH = "main"            # use "claude/sweet-einstein-slyhy7" until the PR is merged
+USE_DRIVE = True           # persist outputs/ to Google Drive
+RUN_SET = "core"           # "core" (~3.5 h): baseline + data ablations + 3 improvements | "full" (~7 h)
+OFFICIAL_LABELS = False    # also download official Labels-v2 via the SoccerNet package (mirror is used otherwise)
+SYNTHETIC_BACKEND = "template"  # "template" (instant) | "hf" (Qwen2.5-1.5B-Instruct on the T4, ~40 min) | "anthropic"
+""")
+
+code("""
+!nvidia-smi --query-gpu=name,memory.total --format=csv
+import os, subprocess
+if not os.path.exists("soccer-event-detection"):
+    !git clone -b $BRANCH $REPO_URL
+%cd soccer-event-detection
+!git log --oneline -3
+!pip -q install -e . "SoccerNet>=0.1.60"
+""")
+
+code("""
+if USE_DRIVE:
+    from google.colab import drive
+    drive.mount("/content/drive")
+    DRIVE_OUT = "/content/drive/MyDrive/soccer-event-detection/outputs"
+    os.makedirs(DRIVE_OUT, exist_ok=True)
+    # keep outputs/ on Drive so finished runs survive disconnects
+    if not os.path.islink("outputs"):
+        !rm -rf outputs && ln -s $DRIVE_OUT outputs
+!ls -la outputs || mkdir -p outputs
+""")
+
+md("## 1. Data download (~2 min) and survey")
+code("""
+args = "--official" if OFFICIAL_LABELS else ""
+!python -m sed.data.download --root data/raw $args
+!python scripts/survey_data.py --config configs/base.yaml --out outputs/survey > /dev/null
+from IPython.display import Markdown, Image, display
+display(Markdown(open("outputs/survey/DATA_SURVEY.md").read().replace("figures/", "outputs/survey/figures/")))
+display(Image("outputs/survey/figures/delay_profile.png"))
+""")
+
+md("""
+## 2. Prepare datasets (~2 min with template synthesis)
+Validation/test = real SoccerNet-Echoes ASR only (official match split). External sources go to train only;
+leakage into valid/test games is asserted.
+""")
+code("""
+over = []
+if SYNTHETIC_BACKEND != "template":
+    over.append(f"sources.synthetic.backend={SYNTHETIC_BACKEND}")
+!python scripts/prepare_data.py --config configs/base.yaml {" ".join(over)} | tail -60
+""")
+
+md("## 3. Sanity check: unit tests + end-to-end smoke test (~2 min)")
+code("""
+!python -m pytest -q
+!bash scripts/smoke_test.sh 2>&1 | tail -8
+""")
+
+md("## 4. Keyword-rule reference (seconds)")
+code("""
+!python scripts/keyword_baseline.py --config configs/base.yaml | head -30
+""")
+
+md("""
+## 5. Baseline: xlm-roberta-base, 3-segment window, 5 epochs, fp16 (~20 min)
+Reference reported for the original project: accuracy ≈ 72.4 %, F1-highlight ≈ 0.67 on validation.
+Their evaluation set was most likely class-balanced; compare with `bal_acc` / `bal_highlight_f1`
+(natural-distribution numbers are much harsher because ~97 % of windows are No-Event).
+""")
+code("""
+!python scripts/run_experiments.py configs/base.yaml
+""")
+
+md("## 6. Data ablation: Echoes only vs. + each source vs. + all (~2.5 h)")
+code("""
+# "Echoes only" = the baseline run of section 5 (configs/ablation/data_echoes.yaml is the same config)
+DATA_RUNS = ["configs/ablation/data_caption.yaml",
+             "configs/ablation/data_synthetic.yaml", "configs/ablation/data_hardneg.yaml",
+             "configs/ablation/data_kaggle.yaml", "configs/ablation/data_all.yaml"]
+!python scripts/run_experiments.py {" ".join(DATA_RUNS)}
+""")
+
+md("""
+## 7. Improvements vs. baseline (one change at a time, Echoes only)
+`imp_class_delays` changes the labels, so compare it on **event-level** metrics only.
+""")
+code("""
+IMP_RUNS = ["configs/ablation/imp_weighted_ce.yaml", "configs/ablation/imp_class_delays.yaml",
+            "configs/ablation/imp_smoothing.yaml"]
+if RUN_SET == "full":
+    IMP_RUNS += ["configs/ablation/imp_focal.yaml", "configs/ablation/imp_context5.yaml",
+                 "configs/ablation/imp_mdeberta.yaml", "configs/ablation/imp_xlmr_large.yaml",
+                 "configs/ablation/imp_all_negatives.yaml"]
+!python scripts/run_experiments.py {" ".join(IMP_RUNS)}
+""")
+
+md("""
+## 8. Two-stage: high-recall stage 1 + verifier
+Model verifier needs `imp_xlmr_large` (RUN_SET="full"); otherwise the context-5 or weighted-CE run is used.
+The LLM verifier (Qwen 1.5B on the T4) is slow: it is run on validation only by default.
+""")
+code("""
+import os
+verifier = next((d for d in ["outputs/imp_xlmr_large", "outputs/imp_context5", "outputs/imp_weighted_ce"]
+                 if os.path.exists(d + "/probs_valid.npy")), None)
+if verifier:
+    !python -m sed.two_stage --config outputs/baseline/config.yaml --stage1 outputs/baseline --verifier model:$verifier --out outputs/baseline/two_stage_model.json
+# LLM verifier (optional, ~1-2 s per candidate):
+# !python -m sed.two_stage --config outputs/baseline/config.yaml --stage1 outputs/baseline --verifier llm:hf:Qwen/Qwen2.5-1.5B-Instruct --splits valid --out outputs/baseline/two_stage_llm.json
+""")
+
+md("## 9. Final candidate (edit `configs/final.yaml` after looking at the ablations) (~45 min)")
+code("""
+!python scripts/run_experiments.py configs/final.yaml
+""")
+
+md("## 10. Results")
+code("""
+import json, glob, pandas as pd
+runs = ["outputs/keyword_baseline", "outputs/baseline"] + sorted(set(glob.glob("outputs/data_*") + glob.glob("outputs/imp_*"))) + ["outputs/final"]
+rows = [json.load(open(r + "/summary.json")) for r in runs if os.path.exists(r + "/summary.json")]
+df = pd.DataFrame(rows).set_index("run")
+cols = ["seg_acc", "seg_macro_f1", "seg_highlight_f1", "bal_acc", "bal_highlight_f1",
+        "evt_precision", "evt_recall", "evt_f1", "evt_f1_Goal", "evt_f1_Card", "evt_f1_Penalty",
+        "test_evt_precision", "test_evt_recall", "test_evt_f1", "train_time_min"]
+display(df[[c for c in cols if c in df]].round(3))
+print(df[[c for c in cols if c in df]].round(3).to_markdown())
+""")
+code("""
+from IPython.display import Image, display
+for run in ["outputs/baseline", "outputs/final"]:
+    if os.path.exists(run + "/metrics.json"):
+        m = json.load(open(run + "/metrics.json"))
+        print(run, "thresholds:", m["thresholds"])
+        print(" FP groups (valid):", {k: v["count"] for k, v in m["valid"]["fp_diagnosis"]["groups"].items()})
+        print(" event F1 argmax/no NMS -> tuned+NMS:", round(m["valid"]["event_argmax_no_nms"]["overall"]["f1"], 3),
+              "->", round(m["valid"]["event"]["overall"]["f1"], 3))
+        display(Image(run + "/pr_curves_valid.png"), Image(run + "/confusion_valid.png"))
+""")
+
+md("## 11. Save artifacts (results table + best checkpoint) and try the API")
+code("""
+!cp -r outputs/survey/figures docs_figures_colab 2>/dev/null || true
+!cd outputs && zip -qr ../results_bundle.zip */summary.json */metrics.json */history.json */config.yaml */*.png results.md 2>/dev/null; ls -lh ../results_bundle.zip 2>/dev/null || ls -lh results_bundle.zip
+best = "outputs/final/best" if os.path.exists("outputs/final/best") else "outputs/baseline/best"
+!python -m sed.infer --model $best --transcript examples/request.json | head -30
+print("Download results_bundle.zip and", best, "(model for the Docker service).")
+""")
+
+nb = {"cells": CELLS, "metadata": {"accelerator": "GPU", "colab": {"provenance": [], "gpuType": "T4"},
+                                    "kernelspec": {"display_name": "Python 3", "name": "python3"},
+                                    "language_info": {"name": "python"}},
+      "nbformat": 4, "nbformat_minor": 5}
+out = Path(__file__).resolve().parents[1] / "notebooks" / "train_colab.ipynb"
+out.parent.mkdir(exist_ok=True)
+out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n")
+print("wrote", out)

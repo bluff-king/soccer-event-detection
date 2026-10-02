@@ -1,0 +1,29 @@
+{
+ "events": [
+  {
+   "type": "Goal",
+   "timestamp": 1857.0,
+   "confidence": 0.7799,
+   "half": null,
+   "segment": {
+    "start": 1862.0,
+    "end": 1864.0,
+    "text": "If at first you don't succeed..."
+   }
+  },
+  {
+   "type": "Goal",
+   "timestamp": 1954.0,
+   "confidence": 0.7241,
+   "half": null,
+   "segment": {
+    "start": 1959.0,
+    "end": 1962.0,
+    "text": "There's just absolutely no need off the back of going 1-0 up."
+   }
+  }
+ ],
+ "n_segments": 70,
+ "model": "outputs/cpu_tiny/best (tiny CPU model, illustration only)",
+ "latency_ms": 56.3
+}
