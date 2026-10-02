@@ -17,6 +17,7 @@ dependencies = [
   "torch>=2.1",
   "transformers>=4.40",
   "sentencepiece",
+  "protobuf",
   "tokenizers",
   "SoccerNet>=0.1.60",
 ]
