@@ -28,8 +28,18 @@ data:
 sources:                                           # external data, TRAIN ONLY
   caption: {enabled: false, style: sentence_window}
   kaggle: {enabled: false, max_per_class: 20000, neg_per_pos: 1.0, mask: true}
-  synthetic: {enabled: false, path: data/processed/synthetic.jsonl}
-  hardneg: {enabled: false, path: data/processed/hardneg.jsonl}
+  synthetic:
+    enabled: false
+    backend: template                              # template (offline) | hf (local LLM, Colab) | anthropic
+    backend_kwargs: null                           # e.g. {model: Qwen/Qwen2.5-1.5B-Instruct}
+    targets: {Penalty: 3000, Goal: 1000, Card: 1000}   # rare class first
+    per_call: 5
+    noise: true                                    # ASR-style noise (typos, no punctuation, truncation)
+  hardneg:
+    enabled: false
+    per_category: 300                              # generated: replay, past_reference, near_miss, should_be, ...
+    mined_max: 5000                                # + No-Event Echoes train windows mentioning a keyword
+    mined_min_gap: 120.0                           # s; skip mined windows near a real event (likely label noise)
 
 model:
   name: xlm-roberta-base
