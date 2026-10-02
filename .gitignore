@@ -12,3 +12,4 @@ __pycache__/
 *.ckpt
 *.onnx
 mlruns/
+docker/certs/*.crt
