@@ -73,7 +73,7 @@ else:  # runtime kept from an earlier session: get the latest code
 !git log --oneline -3
 !pip -q install -e . "SoccerNet>=0.1.60"
 if USE_WANDB:
-    !pip -q install wandb
+    !pip -q install -U "wandb>=0.22"  # new-format keys (wandb_v1_...) need a recent client
     from google.colab import userdata
     try:
         _key = userdata.get(WANDB_SECRET)
