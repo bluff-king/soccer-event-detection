@@ -322,6 +322,17 @@ mất khoảng 60 phút (3 epoch). Đây là ước tính, sẽ cập nhật khi
 Đã đo thật: `cpu_tiny` mất 17.6 phút train trên CPU 4 nhân; `smoke.yaml` mất khoảng 1–2 phút; image Docker đã được
 build và chạy thử bằng `docker run` trong môi trường này.
 
+**Tận dụng GPU.** Có ba cơ chế:
+- Mọi cửa sổ được tokenize **một lần** bằng tokenizer batch, thay vì tokenize bằng Python trong từng batch. Cách này
+  cho token giống hệt cách cũ (có test kiểm tra) và nhanh hơn khoảng 1.6 lần trên tập valid 123k cửa sổ, đo trên CPU.
+- Khi đánh giá, batch 512 được sắp theo độ dài để ít padding.
+- Theo dõi tiến độ qua các trường `train_samples_per_s` và `gpu_peak_mem_gb` trong `history.json`.
+
+Cửa sổ trung bình chỉ dài 33 token (p95 là 63), nên batch ngẫu nhiên phí khoảng một nửa phép tính vào padding.
+`train.group_by_length: true` (và biến `FAST_MODE=True` trong notebook: batch 64, lr 3e-5, ghi kết quả vào
+`outputs_fast/`) khắc phục chỗ này. Tuy nhiên tuỳ chọn này thay đổi thành phần batch, nên kết quả chỉ so được với
+các run cùng chế độ.
+
 ## 9. Cấu trúc repo
 
 ```

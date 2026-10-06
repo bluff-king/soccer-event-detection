@@ -38,6 +38,10 @@ USE_DRIVE = True           # persist outputs/ to Google Drive
 RUN_SET = "core"           # "core" (~3.5 h): baseline + data ablations + 3 improvements | "full" (~7 h)
 OFFICIAL_LABELS = False    # also download official Labels-v2 via the SoccerNet package (mirror is used otherwise)
 SYNTHETIC_BACKEND = "template"  # "template" (instant) | "hf" (Qwen2.5-1.5B-Instruct on the T4, ~40 min) | "anthropic"
+FAST_MODE = False          # True: length-grouped batches of 64 (less padding, ~1.5-2x faster training). Changes the
+                           # training batches, so results go to a separate folder (outputs_fast) and are only
+                           # comparable with other FAST_MODE runs.
+FAST_SET = "--set train.group_by_length=true train.batch_size=64 train.lr=3e-5" if FAST_MODE else ""
 """)
 
 code("""
@@ -54,7 +58,7 @@ code("""
 if USE_DRIVE:
     from google.colab import drive
     drive.mount("/content/drive")
-    DRIVE_OUT = "/content/drive/MyDrive/soccer-event-detection/outputs"
+    DRIVE_OUT = "/content/drive/MyDrive/soccer-event-detection/" + ("outputs_fast" if FAST_MODE else "outputs")
     os.makedirs(DRIVE_OUT, exist_ok=True)
     # keep outputs/ on Drive so finished runs survive disconnects
     if not os.path.islink("outputs"):
@@ -102,7 +106,7 @@ Their evaluation set was most likely class-balanced; compare with `bal_acc` / `b
 (natural-distribution numbers are much harsher because ~97 % of windows are No-Event).
 """)
 code("""
-!python scripts/run_experiments.py configs/base.yaml
+!python scripts/run_experiments.py configs/base.yaml $FAST_SET
 """)
 
 md("## 6. Data ablation: Echoes only vs. + each source vs. + all (~2.5 h)")
@@ -111,7 +115,7 @@ code("""
 DATA_RUNS = ["configs/ablation/data_caption.yaml",
              "configs/ablation/data_synthetic.yaml", "configs/ablation/data_hardneg.yaml",
              "configs/ablation/data_kaggle.yaml", "configs/ablation/data_all.yaml"]
-!python scripts/run_experiments.py {" ".join(DATA_RUNS)}
+!python scripts/run_experiments.py {" ".join(DATA_RUNS)} $FAST_SET
 """)
 
 md("""
@@ -123,9 +127,11 @@ IMP_RUNS = ["configs/ablation/imp_weighted_ce.yaml", "configs/ablation/imp_class
             "configs/ablation/imp_smoothing.yaml"]
 if RUN_SET == "full":
     IMP_RUNS += ["configs/ablation/imp_focal.yaml", "configs/ablation/imp_context5.yaml",
-                 "configs/ablation/imp_mdeberta.yaml", "configs/ablation/imp_xlmr_large.yaml",
-                 "configs/ablation/imp_all_negatives.yaml"]
-!python scripts/run_experiments.py {" ".join(IMP_RUNS)}
+                 "configs/ablation/imp_mdeberta.yaml", "configs/ablation/imp_all_negatives.yaml"]
+!python scripts/run_experiments.py {" ".join(IMP_RUNS)} $FAST_SET
+if RUN_SET == "full":  # large model keeps its own batch size / lr; FAST_MODE only groups by length here
+    LARGE_SET = "--set train.group_by_length=true" if FAST_MODE else ""
+    !python scripts/run_experiments.py configs/ablation/imp_xlmr_large.yaml $LARGE_SET
 """)
 
 md("""
@@ -145,7 +151,7 @@ if verifier:
 
 md("## 9. Final candidate (edit `configs/final.yaml` after looking at the ablations) (~45 min)")
 code("""
-!python scripts/run_experiments.py configs/final.yaml
+!python scripts/run_experiments.py configs/final.yaml $FAST_SET
 """)
 
 md("## 10. Results")

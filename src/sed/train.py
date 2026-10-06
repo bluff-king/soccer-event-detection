@@ -22,7 +22,7 @@ from .data.prepare import assemble_train, load_split
 from .evaluate import evaluate_checkpoint, summary_row
 from .labels import LABEL2ID
 from .metrics import segment_metrics
-from .model.encoding import Collator, WindowDataset
+from .model.encoding import Collator, LengthGroupedBatchSampler, WindowDataset, pretokenize
 from .model.factory import build_model_and_tokenizer, load_checkpoint
 from .model.losses import build_loss
 from .model.predict import get_device, predict_probs
@@ -62,13 +62,22 @@ def train(cfg: dict) -> dict:
     model, tok = build_model_and_tokenizer(
         cfg, [" ".join([s.ctx_before, s.text, s.ctx_after]) for s in train_samples[:50000]])
     model.to(device)
+    t_tok = time.time()
     ds = WindowDataset(train_samples, tok, cfg["model"]["max_length"])
+    valid_ids = pretokenize(tok, valid_samples, cfg["model"]["max_length"])
+    print(f"[data] pre-tokenised {len(ds) + len(valid_ids)} windows in {time.time() - t_tok:.0f}s", flush=True)
     sampler = make_sampler(cfg, labels)
     g = torch.Generator()
     g.manual_seed(cfg.get("seed", 42))
-    dl = torch.utils.data.DataLoader(ds, batch_size=tr["batch_size"], shuffle=sampler is None, sampler=sampler,
-                                     collate_fn=Collator(tok.pad_token_id), num_workers=tr.get("num_workers", 0),
-                                     generator=g, drop_last=False)
+    collate = Collator(tok.pad_token_id)
+    if tr.get("group_by_length") and sampler is None:
+        dl = torch.utils.data.DataLoader(
+            ds, batch_sampler=LengthGroupedBatchSampler([len(x) for x in ds.ids], tr["batch_size"], g),
+            collate_fn=collate, num_workers=tr.get("num_workers", 0))
+    else:
+        dl = torch.utils.data.DataLoader(ds, batch_size=tr["batch_size"], shuffle=sampler is None, sampler=sampler,
+                                         collate_fn=collate, num_workers=tr.get("num_workers", 0),
+                                         generator=g, drop_last=False)
     loss_fn = build_loss(cfg, labels).to(device)
     no_decay = ("bias", "LayerNorm.weight", "layer_norm", "norm.weight")
     params = [
@@ -94,10 +103,13 @@ def train(cfg: dict) -> dict:
     def run_eval(tag: str):
         nonlocal best
         probs = predict_probs(model, tok, valid_samples, cfg["model"]["max_length"], tr["eval_batch_size"], device,
-                              tr.get("fp16", True))
+                              tr.get("fp16", True), ids=valid_ids)
         y = np.array([LABEL2ID[s.label] for s in valid_samples])
         m = segment_metrics(y, probs.argmax(1))
         rec = {"step": step, "tag": tag, "elapsed_s": round(time.time() - t0, 1),
+               "train_samples_per_s": round(step * tr["batch_size"] * tr.get("grad_accum", 1)
+                                            / max(time.time() - t0, 1e-6), 1),
+               "gpu_peak_mem_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0,
                **{k: m[k] for k in ("accuracy", "macro_f1", "highlight_f1", "highlight_precision", "highlight_recall")}}
         history.append(rec)
         print(f"[eval] {json.dumps(rec)}", flush=True)

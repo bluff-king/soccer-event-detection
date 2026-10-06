@@ -48,7 +48,7 @@ model:
 train:
   epochs: 5
   batch_size: 32
-  eval_batch_size: 128
+  eval_batch_size: 512                             # inference only; larger = better GPU use, same results
   lr: 2.0e-5
   weight_decay: 0.01
   warmup_ratio: 0.06
@@ -62,6 +62,8 @@ train:
   eval_every: null                                 # steps; null = once per epoch
   select_eval_negatives: 30000                     # per-epoch selection: all valid positives + 30k negatives
   num_workers: 2
+  group_by_length: false                           # true = batches of similar length (less padding, ~1.5-2x faster);
+                                                   # changes batch composition, so keep false for runs compared with existing ones
   select_metric: highlight_f1                      # model selection on validation
 
 postprocess:

@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from ..data.types import Sample
-from .encoding import Collator, WindowDataset
+from .encoding import Collator, WindowDataset, pretokenize
 
 
 def get_device() -> str:
@@ -13,12 +13,17 @@ def get_device() -> str:
 
 @torch.no_grad()
 def predict_probs(model, tok, samples: list[Sample], max_length: int, batch_size: int = 128,
-                  device: str | None = None, fp16: bool = True, num_workers: int = 0) -> np.ndarray:
+                  device: str | None = None, fp16: bool = True, num_workers: int = 0,
+                  ids: list[list[int]] | None = None) -> np.ndarray:
+    """Class probabilities per window. ``ids`` = output of ``pretokenize`` for ``samples`` (reused
+    across repeated evaluations of the same set)."""
     device = device or get_device()
     model.eval().to(device)
-    # sort by length for fast batched inference, then restore order
-    order = np.argsort([len(s.text) + len(s.ctx_before) + len(s.ctx_after) for s in samples])
-    ds = WindowDataset([samples[i] for i in order], tok, max_length)
+    if ids is None:
+        ids = pretokenize(tok, samples, max_length)
+    # sort by token length for fast batched inference (minimal padding), then restore order
+    order = np.argsort([len(x) for x in ids], kind="stable")
+    ds = WindowDataset([samples[i] for i in order], tok, max_length, ids=[ids[i] for i in order])
     dl = torch.utils.data.DataLoader(ds, batch_size=batch_size, shuffle=False, collate_fn=Collator(tok.pad_token_id),
                                      num_workers=num_workers)
     out = []
