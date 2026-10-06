@@ -65,6 +65,9 @@ train:
   group_by_length: false                           # true = batches of similar length (less padding, ~1.5-2x faster);
                                                    # changes batch composition, so keep false for runs compared with existing ones
   select_metric: highlight_f1                      # model selection on validation
+  early_stop_patience: null                        # e.g. 1 = stop after 1 epoch without improvement. The LR schedule
+                                                   # still spans all epochs, so the kept checkpoint is the same as a full run
+                                                   # whenever the best epoch is followed by a worse one
 
 postprocess:
   smoothing: 1                                     # moving-average window over segment probs (1 = off)
@@ -75,3 +78,10 @@ postprocess:
 eval:
   tolerance: 30.0                                  # +-T s for event-level matching
   balanced_neg_ratio: 1.0                          # extra "balanced" segment metrics (comparable to the reference)
+
+logging:
+  wandb: false                                     # Weights & Biases tracking (needs WANDB_API_KEY); no-op when off/unavailable
+  project: football-highlight
+  entity: null                                     # W&B team/user, e.g. vubkk67-hanoi-university-of-science-and-technology
+  group: null                                      # runs of one notebook session share a group
+  name_prefix: run                                 # run name = <prefix>_<run>_<model>_len<max_length>_ep<epochs>

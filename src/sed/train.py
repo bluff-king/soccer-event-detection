@@ -26,6 +26,7 @@ from .model.encoding import Collator, LengthGroupedBatchSampler, WindowDataset, 
 from .model.factory import build_model_and_tokenizer, load_checkpoint
 from .model.losses import build_loss
 from .model.predict import get_device, predict_probs
+from .tracking import Tracker
 
 
 def make_sampler(cfg: dict, labels: list[str]):
@@ -98,10 +99,14 @@ def train(cfg: dict) -> dict:
     eval_every = tr.get("eval_every") or steps_per_epoch
     select = tr.get("select_metric", "highlight_f1")
     best, history, step = -1.0, [], 0
+    patience = tr.get("early_stop_patience")  # evaluations without improvement before stopping (null = off)
+    since_best = 0
+    tracker = Tracker(cfg)
+    tracker.summary({"n_train": len(train_samples), **{f"train_count/{k}": v for k, v in Counter(labels).items()}})
     t0 = time.time()
 
     def run_eval(tag: str):
-        nonlocal best
+        nonlocal best, since_best
         probs = predict_probs(model, tok, valid_samples, cfg["model"]["max_length"], tr["eval_batch_size"], device,
                               tr.get("fp16", True), ids=valid_ids)
         y = np.array([LABEL2ID[s.label] for s in valid_samples])
@@ -112,11 +117,15 @@ def train(cfg: dict) -> dict:
                "gpu_peak_mem_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0,
                **{k: m[k] for k in ("accuracy", "macro_f1", "highlight_f1", "highlight_precision", "highlight_recall")}}
         history.append(rec)
+        tracker.log({f"valid_select/{k}": v for k, v in rec.items() if k not in ("step", "tag")}, step=step)
         print(f"[eval] {json.dumps(rec)}", flush=True)
         if m[select] > best:
+            since_best = 0
             best = m[select]
             model.save_pretrained(out / "best")
             tok.save_pretrained(out / "best")
+        else:
+            since_best += 1
         model.train()
 
     model.train()
@@ -137,10 +146,16 @@ def train(cfg: dict) -> dict:
                 sched.step()
                 step += 1
                 if step % 50 == 0:
+                    tracker.log({"train/loss": loss.item() * tr.get("grad_accum", 1), "train/lr": sched.get_last_lr()[0],
+                                 "train/epoch": epoch}, step=step)
                     print(f"[train] epoch={epoch} step={step}/{total} loss={loss.item() * tr.get('grad_accum', 1):.4f} "
                           f"lr={sched.get_last_lr()[0]:.2e} {time.time() - t0:.0f}s", flush=True)
                 if step % eval_every == 0:
                     run_eval(f"epoch{epoch}")
+                    if patience and since_best >= patience:
+                        print(f"[train] early stop: no {select} improvement in {patience} evaluation(s)", flush=True)
+                        done = True
+                        break
                 if step >= total:
                     done = True
                     break
@@ -163,6 +178,10 @@ def train(cfg: dict) -> dict:
     row["train_time_min"] = round(train_time / 60, 1)
     (out / "summary.json").write_text(json.dumps(row, indent=1))
     print("[summary]", json.dumps(row), flush=True)
+    tracker.log_results(res, out, row)
+    if tracker.run is not None:
+        (out / ".wandb_synced").write_text(tracker.run.url or "")
+    tracker.finish()
     return res
 
 

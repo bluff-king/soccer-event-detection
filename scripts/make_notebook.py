@@ -33,15 +33,33 @@ session can resume (outputs are synced to Drive if `USE_DRIVE=True`).
 code("""
 # ---- settings -------------------------------------------------------------
 REPO_URL = "https://github.com/bluff-king/soccer-event-detection"
-BRANCH = "main"            # use "claude/sweet-einstein-slyhy7" until the PR is merged
+BRANCH = "claude/sweet-einstein-slyhy7"  # switch to "main" once the PR is merged
 USE_DRIVE = True           # persist outputs/ to Google Drive
 RUN_SET = "core"           # "core" (~3.5 h): baseline + data ablations + 3 improvements | "full" (~7 h)
 OFFICIAL_LABELS = False    # also download official Labels-v2 via the SoccerNet package (mirror is used otherwise)
 SYNTHETIC_BACKEND = "template"  # "template" (instant) | "hf" (Qwen2.5-1.5B-Instruct on the T4, ~40 min) | "anthropic"
-FAST_MODE = False          # True: length-grouped batches of 64 (less padding, ~1.5-2x faster training). Changes the
+FAST_MODE = False          # True: length-grouped batches of 64 + early stopping (best epoch is usually 0-1). Changes the
                            # training batches, so results go to a separate folder (outputs_fast) and are only
                            # comparable with other FAST_MODE runs.
-FAST_SET = "--set train.group_by_length=true train.batch_size=64 train.lr=3e-5" if FAST_MODE else ""
+EARLY_STOP = True          # stop a run after 1 epoch without validation improvement (best epoch is usually 0-1);
+                           # the kept checkpoint is the same as with all 5 epochs, so results stay comparable
+USE_WANDB = True           # log runs to Weights & Biases
+WANDB_PROJECT = "football-highlight"
+WANDB_ENTITY = "vubkk67-hanoi-university-of-science-and-technology"
+WANDB_SECRET = "kgat"      # name of the Colab Secret (key icon, left bar) whose VALUE is the W&B API key
+
+_over = []
+if FAST_MODE:
+    _over += ["train.group_by_length=true", "train.batch_size=64", "train.lr=3e-5"]
+if EARLY_STOP or FAST_MODE:
+    _over += ["train.early_stop_patience=1"]
+if USE_WANDB:
+    import time as _time
+    _over += ["logging.wandb=true", f"logging.project={WANDB_PROJECT}", f"logging.entity={WANDB_ENTITY}",
+              f"logging.group=colab_{_time.strftime('%Y%m%d_%H%M')}", "logging.name_prefix=colab"]
+EXTRA_SET = ("--set " + " ".join(_over)) if _over else ""
+# xlm-roberta-large keeps its own batch size / lr
+LARGE_SET = ("--set " + " ".join(o for o in _over if not o.startswith(("train.batch_size", "train.lr")))) if _over else ""
 """)
 
 code("""
@@ -49,9 +67,29 @@ code("""
 import os, subprocess
 if not os.path.exists("soccer-event-detection"):
     !git clone -b $BRANCH $REPO_URL
+else:  # runtime kept from an earlier session: get the latest code
+    !git -C soccer-event-detection fetch -q origin $BRANCH && git -C soccer-event-detection checkout -q $BRANCH && git -C soccer-event-detection reset -q --hard origin/$BRANCH
 %cd soccer-event-detection
 !git log --oneline -3
 !pip -q install -e . "SoccerNet>=0.1.60"
+if USE_WANDB:
+    !pip -q install wandb
+    from google.colab import userdata
+    try:
+        _key = userdata.get(WANDB_SECRET)
+    except Exception as e:
+        _key = None
+        print(f"Cannot read Colab Secret {WANDB_SECRET!r} ({e}); enable 'Notebook access' for it. W&B logging is off.")
+    if _key:
+        import wandb
+        try:  # verify the key against the W&B server instead of guessing its format
+            wandb.login(key=_key.strip(), relogin=True, verify=True)
+            os.environ["WANDB_API_KEY"] = _key.strip()  # training subprocesses read the key from the environment
+            print("W&B login ok (key from Colab Secret", repr(WANDB_SECRET) + ")")
+        except Exception as e:
+            print(f"W&B login FAILED with the value of secret {WANDB_SECRET!r}: {e}")
+            print("Copy the key again from https://wandb.ai/authorize (check Name/Value are not swapped). "
+                  "Training continues without W&B logging.")
 """)
 
 code("""
@@ -64,6 +102,9 @@ if USE_DRIVE:
     if not os.path.islink("outputs"):
         !rm -rf outputs && ln -s $DRIVE_OUT outputs
 !ls -la outputs || mkdir -p outputs
+if USE_WANDB and os.environ.get("WANDB_API_KEY"):
+    # upload runs finished in earlier sessions (once; marked with outputs/<run>/.wandb_synced)
+    !python scripts/wandb_backfill.py outputs/* --set logging.project=$WANDB_PROJECT logging.entity=$WANDB_ENTITY logging.name_prefix=colab
 """)
 
 md("## 1. Data download (~2 min) and survey")
@@ -106,7 +147,7 @@ Their evaluation set was most likely class-balanced; compare with `bal_acc` / `b
 (natural-distribution numbers are much harsher because ~97 % of windows are No-Event).
 """)
 code("""
-!python scripts/run_experiments.py configs/base.yaml $FAST_SET
+!python scripts/run_experiments.py configs/base.yaml $EXTRA_SET
 """)
 
 md("## 6. Data ablation: Echoes only vs. + each source vs. + all (~2.5 h)")
@@ -115,7 +156,7 @@ code("""
 DATA_RUNS = ["configs/ablation/data_caption.yaml",
              "configs/ablation/data_synthetic.yaml", "configs/ablation/data_hardneg.yaml",
              "configs/ablation/data_kaggle.yaml", "configs/ablation/data_all.yaml"]
-!python scripts/run_experiments.py {" ".join(DATA_RUNS)} $FAST_SET
+!python scripts/run_experiments.py {" ".join(DATA_RUNS)} $EXTRA_SET
 """)
 
 md("""
@@ -128,9 +169,8 @@ IMP_RUNS = ["configs/ablation/imp_weighted_ce.yaml", "configs/ablation/imp_class
 if RUN_SET == "full":
     IMP_RUNS += ["configs/ablation/imp_focal.yaml", "configs/ablation/imp_context5.yaml",
                  "configs/ablation/imp_mdeberta.yaml", "configs/ablation/imp_all_negatives.yaml"]
-!python scripts/run_experiments.py {" ".join(IMP_RUNS)} $FAST_SET
+!python scripts/run_experiments.py {" ".join(IMP_RUNS)} $EXTRA_SET
 if RUN_SET == "full":  # large model keeps its own batch size / lr; FAST_MODE only groups by length here
-    LARGE_SET = "--set train.group_by_length=true" if FAST_MODE else ""
     !python scripts/run_experiments.py configs/ablation/imp_xlmr_large.yaml $LARGE_SET
 """)
 
@@ -151,7 +191,7 @@ if verifier:
 
 md("## 9. Final candidate (edit `configs/final.yaml` after looking at the ablations) (~45 min)")
 code("""
-!python scripts/run_experiments.py configs/final.yaml $FAST_SET
+!python scripts/run_experiments.py configs/final.yaml $EXTRA_SET
 """)
 
 md("## 10. Results")

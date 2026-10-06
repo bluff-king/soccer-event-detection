@@ -270,8 +270,22 @@ Sinh dữ liệu tổng hợp bằng LLM:
 ### 7.4 Colab
 Mở `notebooks/train_colab.ipynb` trên Colab với GPU T4 rồi chạy từ trên xuống. Notebook clone repo, cài đặt, tải dữ
 liệu, chạy khảo sát, chuẩn bị dữ liệu, smoke test, keyword rule, baseline, ablation, cải tiến, 2 tầng, final, in bảng
-kết quả rồi zip kết quả lên Drive. Biến `RUN_SET="core"` (khoảng 3.5 giờ) hoặc `"full"` (khoảng 7 giờ). Các run đã
-xong sẽ được bỏ qua khi chạy lại.
+kết quả rồi zip kết quả lên Drive. Các run đã xong sẽ được bỏ qua khi chạy lại.
+
+Thời gian đo thật trên T4: mỗi run xlm-roberta-base mất 45–55 phút với 5 epoch; `data_kaggle` mất khoảng 90 phút.
+Checkpoint tốt nhất luôn rơi vào epoch 0–1, nên `EARLY_STOP=True` (mặc định) dừng sau 1 epoch không cải thiện. Lịch
+learning rate vẫn tính cho đủ 5 epoch, nên checkpoint được giữ giống hệt khi chạy hết 5 epoch.
+
+**Weights & Biases.** Cách bật:
+1. Thêm API key vào Colab Secrets (biểu tượng chìa khoá). Lấy key ở https://wandb.ai/authorize; thư viện wandb chỉ
+   chấp nhận key từ 40 ký tự trở lên.
+2. Bật "Notebook access" cho secret đó.
+3. Đặt `USE_WANDB=True` và `WANDB_SECRET="<tên secret>"`.
+
+Notebook sẽ đăng nhập thử với server wandb trước khi train. Mỗi run log loss và lr, chỉ số valid theo epoch, các chỉ
+số cuối (mức đoạn, mức sự kiện, từng lớp, nhóm FP, ngưỡng), bảng tóm tắt, đường PR và confusion matrix. Run được đặt
+tên `colab_<run>_<model>_len<L>_ep<E>` và gom theo `group` của từng phiên. Các run đã train trước khi bật wandb được
+đẩy lên một lần bằng `scripts/wandb_backfill.py`. Nếu thiếu key hoặc wandb lỗi, quá trình train vẫn chạy bình thường.
 
 ### 7.5 Service suy luận
 ```bash

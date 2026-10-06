@@ -25,6 +25,7 @@ dependencies = [
 [project.optional-dependencies]
 serve = ["fastapi", "uvicorn[standard]", "pydantic>=2"]
 dev = ["pytest", "httpx"]
+track = ["wandb"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
