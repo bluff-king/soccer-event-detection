@@ -35,14 +35,16 @@ code("""
 REPO_URL = "https://github.com/bluff-king/soccer-event-detection"
 BRANCH = "claude/sweet-einstein-slyhy7"  # switch to "main" once the PR is merged
 USE_DRIVE = True           # persist outputs/ to Google Drive
-RUN_SET = "core"           # "core" (~3.5 h): baseline + data ablations + 3 improvements | "full" (~7 h)
+RUN_SET = "core"           # "core": baseline + 5 data ablations + 3 improvements | "full": + 5 more (measured on T4:
+                           # ~45-90 min per run with 5 epochs, roughly half with early stopping)
 OFFICIAL_LABELS = False    # also download official Labels-v2 via the SoccerNet package (mirror is used otherwise)
 SYNTHETIC_BACKEND = "template"  # "template" (instant) | "hf" (Qwen2.5-1.5B-Instruct on the T4, ~40 min) | "anthropic"
 FAST_MODE = False          # True: length-grouped batches of 64 + early stopping (best epoch is usually 0-1). Changes the
                            # training batches, so results go to a separate folder (outputs_fast) and are only
                            # comparable with other FAST_MODE runs.
-EARLY_STOP = True          # stop a run after 1 epoch without validation improvement (best epoch is usually 0-1);
-                           # the kept checkpoint is the same as with all 5 epochs, so results stay comparable
+EARLY_STOP = True          # stop a run when validation stops improving (best epoch is usually 0-1); the kept
+                           # checkpoint is the same as with all 5 epochs, so results stay comparable
+EARLY_STOP_PATIENCE = 1    # epochs without improvement before stopping: 1 = fastest, 2 = safer against noise
 USE_WANDB = True           # log runs to Weights & Biases
 WANDB_PROJECT = "football-highlight"
 WANDB_ENTITY = "vubkk67-hanoi-university-of-science-and-technology"
@@ -52,7 +54,7 @@ _over = []
 if FAST_MODE:
     _over += ["train.group_by_length=true", "train.batch_size=64", "train.lr=3e-5"]
 if EARLY_STOP or FAST_MODE:
-    _over += ["train.early_stop_patience=1"]
+    _over += [f"train.early_stop_patience={int(EARLY_STOP_PATIENCE)}"]
 if USE_WANDB:
     import time as _time
     _over += ["logging.wandb=true", f"logging.project={WANDB_PROJECT}", f"logging.entity={WANDB_ENTITY}",
