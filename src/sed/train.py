@@ -54,6 +54,9 @@ def train(cfg: dict) -> dict:
 
     train_samples = assemble_train(cfg)
     valid_samples = load_split(cfg, "valid")
+    if not valid_samples or not any(s.source == "echoes" for s in train_samples):
+        raise RuntimeError(f"no Echoes train/valid data in {cfg['data']['processed_dir']} (cwd {Path.cwd()}); "
+                           "run scripts/prepare_data.py from the repository root first")
     if tr.get("select_eval_negatives"):
         # per-epoch model selection on all validation positives + a fixed random subset of negatives
         # (the final evaluation always uses the full validation/test sets)

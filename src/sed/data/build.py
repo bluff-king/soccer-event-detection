@@ -76,6 +76,10 @@ def build_echoes(cfg: dict, games: list[GameData] | None = None) -> EchoesBuild:
     dups = 0
     if games is None:
         games, skipped, dups = load_games(cfg)
+        if not games:
+            raise FileNotFoundError(
+                f"no SoccerNet-Echoes games found under {d['echoes_root']} (cwd {Path.cwd()}): "
+                "download the data first (python -m sed.data.download --root data/raw)")
     samples: list[Sample] = []
     delays: list[DelayObs] = []
     for gd in games:

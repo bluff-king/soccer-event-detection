@@ -67,11 +67,13 @@ LARGE_SET = ("--set " + " ".join(o for o in _over if not o.startswith(("train.ba
 code("""
 !nvidia-smi --query-gpu=name,memory.total --format=csv
 import os, subprocess
-if not os.path.exists("soccer-event-detection"):
-    !git clone -b $BRANCH $REPO_URL
-else:  # runtime kept from an earlier session: get the latest code
-    !git -C soccer-event-detection fetch -q origin $BRANCH && git -C soccer-event-detection checkout -q $BRANCH && git -C soccer-event-detection reset -q --hard origin/$BRANCH
-%cd soccer-event-detection
+%cd /content
+# absolute paths: re-running this cell from inside the repo must update it, not clone a second copy into it
+if not os.path.exists("/content/soccer-event-detection/.git"):
+    !git clone -b $BRANCH $REPO_URL /content/soccer-event-detection
+else:  # runtime kept from an earlier run: get the latest code (data/ and outputs/ are untouched)
+    !git -C /content/soccer-event-detection fetch -q origin $BRANCH && git -C /content/soccer-event-detection checkout -q $BRANCH && git -C /content/soccer-event-detection reset -q --hard origin/$BRANCH
+%cd /content/soccer-event-detection
 !git log --oneline -3
 !pip -q install -e . "SoccerNet>=0.1.60"
 if USE_WANDB:

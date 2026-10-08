@@ -50,7 +50,7 @@ class Tracker:
 
             self.run = wandb.init(project=lg.get("project") or "football-highlight", entity=lg.get("entity") or None,
                                   group=lg.get("group") or None, name=run_display_name(cfg), job_type=job_type,
-                                  config=cfg, dir=cfg.get("output_dir"), reinit="finish_previous")
+                                  config=cfg, dir=str(Path(cfg["output_dir"]).resolve()) if cfg.get("output_dir") else None, reinit="finish_previous")
             print(f"[wandb] logging to {self.run.url}", flush=True)
         except Exception as e:  # never let tracking break training
             print(f"[wandb] disabled: {e}", flush=True)
