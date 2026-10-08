@@ -40,6 +40,11 @@ def make_sampler(cfg: dict, labels: list[str]):
 
 
 def train(cfg: dict) -> dict:
+    from .reuse import try_reuse
+
+    reused = try_reuse(cfg)  # post-processing-only configs evaluate an existing run's predictions
+    if reused is not None:
+        return reused
     set_seed(cfg.get("seed", 42))
     tr = cfg["train"]
     out = Path(cfg["output_dir"])

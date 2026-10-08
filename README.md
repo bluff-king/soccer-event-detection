@@ -204,7 +204,7 @@ Quy ước cột như trên, đo trên valid (ngưỡng tune trên valid); `test
 | `imp_context5` | ngữ cảnh 2+1+2 | _TBD_ | | | | | | | |
 | `imp_mdeberta` | mdeberta-v3-base | _TBD_ | | | | | | | |
 | `imp_xlmr_large` | xlm-roberta-large | _TBD_ | | | | | | | |
-| `imp_smoothing` | làm mượt 3 + NMS 45 s | _TBD_ | | | | | | | |
+| `imp_smoothing` | làm mượt 3 + NMS 45 s (dùng lại xác suất của baseline, không train lại) | _TBD_ | | | | | | | |
 | two-stage | baseline + verifier xlmr-large | _TBD_ | | | | | | | |
 | `final` | kết hợp các hướng có lợi | _TBD_ | | | | | | | |
 
