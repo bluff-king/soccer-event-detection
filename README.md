@@ -184,31 +184,49 @@ Chi tiết (metrics.json, đường PR, confusion matrix, ví dụ FP) nằm ở
 - Các số này chứng minh pipeline chạy và học được trên dữ liệu thật. Chúng **không phải** kết quả của baseline
   xlm-roberta (`configs/cpu_tiny.yaml`).
 
-### 5.2 Bảng so sánh baseline và các cải tiến (điền sau khi chạy notebook Colab)
+### 5.2 Bảng so sánh baseline và các cải tiến (Colab T4, RUN_SET="core")
 
-Quy ước cột như trên, đo trên valid (ngưỡng tune trên valid); `test_evt_f1` đo trên test.
-`scripts/run_experiments.py` tự sinh bảng này vào `outputs/results.md`.
+Quy ước cột như trên, đo trên valid (ngưỡng tune trên valid); `test evt F1` đo trên test. Tất cả là xlm-roberta-base,
+len 128, tối đa 5 epoch, early stopping patience 1. `scripts/run_experiments.py` tự sinh bảng này vào
+`outputs/results.md`.
 
-| Run | Thay đổi so với baseline | seg acc | seg F1-hl | bal acc | bal F1-hl | evt P | evt R | evt F1 | test evt F1 |
-|---|---|---|---|---|---|---|---|---|---|
-| mốc công bố (repo gốc) | – | 0.724* | 0.67* | | | | | | |
-| `baseline` = `data_echoes` | xlm-roberta-base, Echoes | _TBD_ | | | | | | | |
-| `data_caption` | + SoccerNet-Caption | _TBD_ | | | | | | | |
-| `data_kaggle` | + Kaggle (đã che từ khóa) | _TBD_ | | | | | | | |
-| `data_synthetic` | + tổng hợp | _TBD_ | | | | | | | |
-| `data_hardneg` | + hard negatives | _TBD_ | | | | | | | |
-| `data_all` | + tất cả | _TBD_ | | | | | | | |
-| `imp_weighted_ce` | CE có trọng số | _TBD_ | | | | | | | |
-| `imp_focal` | focal loss | _TBD_ | | | | | | | |
-| `imp_class_delays` | cửa sổ độ trễ theo lớp (chỉ so mức sự kiện) | _TBD_ | | | | | | | |
-| `imp_context5` | ngữ cảnh 2+1+2 | _TBD_ | | | | | | | |
-| `imp_mdeberta` | mdeberta-v3-base | _TBD_ | | | | | | | |
-| `imp_xlmr_large` | xlm-roberta-large | _TBD_ | | | | | | | |
-| `imp_smoothing` | làm mượt 3 + NMS 45 s (dùng lại xác suất của baseline, không train lại) | _TBD_ | | | | | | | |
-| two-stage | baseline + verifier xlmr-large | _TBD_ | | | | | | | |
-| `final` | kết hợp các hướng có lợi | _TBD_ | | | | | | | |
+| Run | Thay đổi so với baseline | seg acc | seg F1-hl | bal acc | bal F1-hl | evt P | evt R | evt F1 | F1 Goal / Card / Pen | test evt F1 | phút |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| mốc công bố (repo gốc) | – | 0.724* | 0.67* | | | | | | | | |
+| `keyword_rule` | luật từ khóa, không học | 0.878 | 0.084 | 0.538 | 0.263 | 0.074 | 0.804 | 0.136 | 0.087 / 0.518 / 0.045 | 0.130 | 0 |
+| `baseline` = `data_echoes` | xlm-roberta-base, Echoes | 0.918 | 0.228 | 0.655 | 0.511 | 0.442 | 0.444 | 0.443 | 0.462 / 0.457 / 0.167 | 0.427 | 43.3 |
+| `data_caption` | + SoccerNet-Caption | 0.914 | 0.233 | 0.668 | 0.539 | 0.553 | 0.455 | 0.500 | 0.464 / 0.556 / 0.171 | 0.481 | 54.6 |
+| `data_kaggle` | + Kaggle (đã che từ khóa) | 0.886 | 0.206 | 0.679 | 0.570 | 0.401 | 0.532 | 0.457 | 0.400 / 0.565 / **0.269** | 0.445 | 89.8 |
+| `data_synthetic` | + tổng hợp (template) | 0.909 | 0.232 | 0.674 | 0.557 | 0.454 | 0.524 | 0.487 | 0.467 / 0.554 / 0.119 | 0.479 | 46.0 |
+| `data_hardneg` | + hard negatives | **0.931** | **0.263** | 0.666 | 0.524 | 0.541 | 0.512 | **0.526** | 0.468 / **0.604** / 0.129 | **0.498** | 47.5 |
+| `data_all` | + tất cả | 0.887 | 0.206 | 0.675 | 0.567 | 0.369 | 0.630 | 0.465 | **0.533** / 0.445 / 0.183 | 0.477 | 65.8 |
+| `imp_weighted_ce` | CE có trọng số | 0.678 | 0.105 | 0.634 | **0.582** | 0.330 | 0.647 | 0.437 | 0.368 / 0.570 / 0.198 | 0.434 | 17.5† |
+| `imp_class_delays` | cửa sổ độ trễ theo lớp (chỉ so mức sự kiện) | 0.875 | 0.179 | 0.655 | 0.535 | 0.549 | 0.392 | 0.458 | 0.393 / 0.557 / 0.000 | 0.409 | 17.5† |
+| `imp_smoothing` | làm mượt 3 + NMS 45 s (dùng lại xác suất của baseline) | 0.918 | 0.228 | 0.655 | 0.511 | 0.443 | 0.487 | 0.464 | 0.496 / 0.463 / 0.195 | 0.438 | 0 |
+| two-stage | stage 1 = baseline, verifier = `imp_weighted_ce` | | | | | 0.459 | 0.513 | 0.484 | | 0.481 | 0 |
+| `final` | hardneg + caption + synthetic + làm mượt 3 / NMS 45 s | _TBD_ | | | | | | | | | |
 
 \* đo trên tập của repo gốc (nhiều khả năng là tập cân bằng); so với cột `bal`.
+† dừng sớm sau epoch 1 và giữ checkpoint epoch 0 (xem nhận xét bên dưới).
+
+Nhận xét:
+- **Mọi model học đều vượt xa luật từ khóa** (evt F1 0.44–0.53 so với 0.14), nhưng điểm mức đoạn và cột cân bằng vẫn
+  thấp hơn mốc công bố (bal acc ~0.66 so với 0.724). Tập đánh giá ở đây giữ phân bố tự nhiên (~96 % No-Event) nên
+  hai con số không so trực tiếp được.
+- **Hard negatives là thêm dữ liệu có lợi nhất** (+0.083 evt F1 valid, +0.071 test): precision tăng mạnh mà recall
+  không giảm, đúng với chẩn đoán FP (replay và nhắc lại chiếm phần lớn FP). Caption đứng thứ hai (+0.057 / +0.054),
+  rồi tổng hợp (+0.044 / +0.052).
+- **Kaggle giúp Penalty nhiều nhất** (F1 0.269) nhưng là văn bản viết sẵn, khác miền ASR, và gấp 3–4 lần dữ liệu
+  Echoes nên kéo precision xuống và train lâu gấp đôi. `data_all` (có Kaggle) vì thế có recall cao nhất nhưng F1 kém
+  hơn `data_hardneg`: các nguồn không cộng dồn.
+- **Làm mượt + NMS 45 s** cho +0.021 / +0.011 mà không tốn chi phí train nào.
+- **CE có trọng số** đổi precision lấy recall (R 0.647, P 0.330), F1 không tăng.
+- **`imp_class_delays` chưa kết luận được.** Penalty F1 = 0 vì early stopping (patience 1) giữ checkpoint epoch 0,
+  khi model chưa kịp học lớp hiếm này; thêm vào đó chỉ số chọn checkpoint (`highlight_f1` mức đoạn) bị chi phối bởi
+  Goal/Card. Cần chạy lại không early stop (hoặc chọn checkpoint theo F1 mức sự kiện) trước khi đưa vào final.
+- **Hai tầng** (0.484 / 0.481) có lợi so với baseline nhưng không hơn model đơn `data_hardneg`: verifier loại mất
+  quá nhiều sự kiện đúng (recall stage 1 0.885 còn 0.513).
+- **Penalty vẫn là điểm yếu chính** (F1 ≤ 0.27): chỉ 506 đoạn train thật, và bình luận diễn ra trước nhãn ~1 phút.
 
 ## 6. Chẩn đoán precision
 
