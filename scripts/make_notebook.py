@@ -197,6 +197,10 @@ md("## 9. Final candidate (edit `configs/final.yaml` after looking at the ablati
 code("""
 !python scripts/run_experiments.py configs/final.yaml $EXTRA_SET
 """)
+md("Smoothing + NMS on the best single model (`data_hardneg`): re-evaluates its saved predictions, no training (seconds).")
+code("""
+!python scripts/run_experiments.py configs/ablation/imp_hardneg_smoothing.yaml $EXTRA_SET
+""")
 
 md("## 10. Results")
 code("""
@@ -226,7 +230,19 @@ md("## 11. Save artifacts (results table + best checkpoint) and try the API")
 code("""
 !cp -r outputs/survey/figures docs_figures_colab 2>/dev/null || true
 !cd outputs && zip -qr ../results_bundle.zip */summary.json */metrics.json */history.json */config.yaml */*.png results.md 2>/dev/null; ls -lh ../results_bundle.zip 2>/dev/null || ls -lh results_bundle.zip
-best = "outputs/final/best" if os.path.exists("outputs/final/best") else "outputs/baseline/best"
+# best model = highest VALIDATION event F1 (test is only reported); post-processing-only runs point to their source model
+_cands = [(json.load(open(f))["evt_f1"], os.path.dirname(f)) for f in glob.glob("outputs/*/summary.json")
+          if os.path.exists(os.path.dirname(f) + "/sed_inference.json") or os.path.exists(os.path.dirname(f) + "/best")]
+_f1, _run = max(_cands)
+_src = json.load(open(_run + "/metrics.json")).get("reused_predictions_from")
+best = _run + "/best"
+if _src:  # post-processing-only run: source weights + this run's thresholds/smoothing/NMS
+    import shutil
+    best = "/content/best_model"
+    shutil.rmtree(best, ignore_errors=True)
+    shutil.copytree(_src + "/best", best)
+    shutil.copy(_run + "/sed_inference.json", best + "/sed_inference.json")
+print(f"best on valid: {_run} (evt F1 {_f1:.3f}) -> model {best}")
 !python -m sed.infer --model $best --transcript examples/request.json | head -30
 print("Download results_bundle.zip and", best, "(model for the Docker service).")
 """)

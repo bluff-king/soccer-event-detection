@@ -204,10 +204,12 @@ len 128, tối đa 5 epoch, early stopping patience 1. `scripts/run_experiments.
 | `imp_class_delays` | cửa sổ độ trễ theo lớp (chỉ so mức sự kiện) | 0.875 | 0.179 | 0.655 | 0.535 | 0.549 | 0.392 | 0.458 | 0.393 / 0.557 / 0.000 | 0.409 | 17.5† |
 | `imp_smoothing` | làm mượt 3 + NMS 45 s (dùng lại xác suất của baseline) | 0.918 | 0.228 | 0.655 | 0.511 | 0.443 | 0.487 | 0.464 | 0.496 / 0.463 / 0.195 | 0.438 | 0 |
 | two-stage | stage 1 = baseline, verifier = `imp_weighted_ce` | | | | | 0.459 | 0.513 | 0.484 | | 0.481 | 0 |
-| `final` | hardneg + caption + synthetic + làm mượt 3 / NMS 45 s | _TBD_ | | | | | | | | | |
+| `final` | hardneg + caption + synthetic + làm mượt 3 / NMS 45 s | 0.916 | 0.242 | 0.673 | 0.546 | 0.478 | 0.529 | 0.502 | 0.519 / 0.599 / 0.109 | 0.468 | 36.3‡ |
+| `imp_hardneg_smoothing` | `data_hardneg` + làm mượt 3 / NMS 45 s (dùng lại xác suất, không train lại) | _TBD_ | | | | | | | | | 0 |
 
 \* đo trên tập của repo gốc (nhiều khả năng là tập cân bằng); so với cột `bal`.
 † dừng sớm sau epoch 1 và giữ checkpoint epoch 0 (xem nhận xét bên dưới).
+‡ dừng sớm sau epoch 2, giữ checkpoint epoch 1.
 
 Nhận xét:
 - **Mọi model học đều vượt xa luật từ khóa** (evt F1 0.44–0.53 so với 0.14), nhưng điểm mức đoạn và cột cân bằng vẫn
@@ -226,6 +228,11 @@ Nhận xét:
   Goal/Card. Cần chạy lại không early stop (hoặc chọn checkpoint theo F1 mức sự kiện) trước khi đưa vào final.
 - **Hai tầng** (0.484 / 0.481) có lợi so với baseline nhưng không hơn model đơn `data_hardneg`: verifier loại mất
   quá nhiều sự kiện đúng (recall stage 1 0.885 còn 0.513).
+- **Gộp các nguồn tốt không cộng dồn.** `final` (hardneg + caption + synthetic + làm mượt) đạt 0.502 / 0.468, thấp
+  hơn `data_hardneg` đơn lẻ (0.526 / 0.498), giống như `data_all`. Caption (~20k mẫu) và synthetic (3000 Penalty
+  dạng template) làm loãng tín hiệu hard negative, và synthetic còn kéo Penalty xuống (0.109).
+  → **Model chọn theo valid là `data_hardneg`** (cũng tốt nhất trên test). Notebook (mục 11) tự chọn run có evt F1
+  trên valid cao nhất làm model cho API.
 - **Penalty vẫn là điểm yếu chính** (F1 ≤ 0.27): chỉ 506 đoạn train thật, và bình luận diễn ra trước nhãn ~1 phút.
 
 ## 6. Chẩn đoán precision
