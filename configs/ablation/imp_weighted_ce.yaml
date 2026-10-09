@@ -1,0 +1,6 @@
+# class-weighted CE (inverse sqrt frequency)
+_base_: ../base.yaml
+output_dir: outputs/imp_weighted_ce
+run_name: imp_weighted_ce
+train:
+  loss: weighted_ce

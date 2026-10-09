@@ -1,0 +1,87 @@
+# Baseline: re-implementation of the reference "Event-Detection" setup
+# (xlm-roberta-base, 3-segment context window, delay-aware labels, 5 epochs, fp16).
+seed: 42
+output_dir: outputs/baseline
+
+data:
+  raw_root: data/raw
+  echoes_root: data/raw/sn-echoes
+  mirror_root: data/raw/sn-echoes-sushant          # Labels-v2 + Caption mirror (summaries/)
+  lang_csv: data/raw/sn-echoes-sushant/SN-echoes-lang.csv
+  official_root: data/raw/soccernet                # optional official Labels-v2.json / Labels-caption.json
+  label_source: auto                               # auto | official | mirror
+  asr_variant: auto_en                             # auto_en | auto | whisper_v2_en | ...
+  processed_dir: data/processed
+  split_method: official                           # official SoccerNet split (300/100/100) | hash
+  max_games: null                                  # limit #games per split (smoke tests)
+  dedupe_window: 5.0                               # merge duplicate Labels-v2 annotations (s)
+  # delay-aware labelling: segment overlaps [t + delay_min, t + delay_max] of an event -> positive
+  delay_min: -5.0
+  delay_max: 15.0
+  delay_per_class: null                            # e.g. {Goal: [-5, 20], Card: [-15, 15], Penalty: [-45, 5]}
+  ctx_before: 1
+  ctx_after: 1
+  # train-time negative subsampling (valid/test always keep the natural distribution)
+  train_neg_ratio: 4.0                             # keep 4 No-Event per positive (null = keep all ~380k)
+  keep_keyword_negatives: true                     # never drop No-Event windows that mention goal/card/penalty
+
+sources:                                           # external data, TRAIN ONLY
+  caption: {enabled: false, style: sentence_window}
+  kaggle: {enabled: false, max_per_class: 20000, neg_per_pos: 1.0, mask: true}
+  synthetic:
+    enabled: false
+    backend: template                              # template (offline) | hf (local LLM, Colab) | anthropic
+    backend_kwargs: null                           # e.g. {model: Qwen/Qwen2.5-1.5B-Instruct}
+    targets: {Penalty: 3000, Goal: 1000, Card: 1000}   # rare class first
+    per_call: 5
+    noise: true                                    # ASR-style noise (typos, no punctuation, truncation)
+  hardneg:
+    enabled: false
+    per_category: 300                              # generated: replay, past_reference, near_miss, should_be, ...
+    mined_max: 5000                                # + No-Event Echoes train windows mentioning a keyword
+    mined_min_gap: 120.0                           # s; skip mined windows near a real event (likely label noise)
+
+model:
+  name: xlm-roberta-base
+  max_length: 128
+
+train:
+  epochs: 5
+  batch_size: 32
+  eval_batch_size: 512                             # inference only; larger = better GPU use, same results
+  lr: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.06
+  grad_accum: 1
+  fp16: true                                       # ignored on CPU
+  loss: ce                                         # ce | weighted_ce | focal
+  class_weights: null                              # null -> inverse sqrt frequency when loss=weighted_ce
+  focal_gamma: 2.0
+  sampler: none                                    # none | balanced (WeightedRandomSampler)
+  max_steps: null                                  # cap steps (smoke tests)
+  eval_every: null                                 # steps; null = once per epoch
+  select_eval_negatives: 30000                     # per-epoch selection: all valid positives + 30k negatives
+  num_workers: 2
+  group_by_length: false                           # true = batches of similar length (less padding, ~1.5-2x faster);
+                                                   # changes batch composition, so keep false for runs compared with existing ones
+  select_metric: highlight_f1                      # model selection on validation
+  early_stop_patience: null                        # e.g. 1 = stop after 1 epoch without improvement. The LR schedule
+                                                   # still spans all epochs, so the kept checkpoint is the same as a full run
+                                                   # whenever the best epoch is followed by a worse one
+
+postprocess:
+  smoothing: 1                                     # moving-average window over segment probs (1 = off)
+  nms_window: 30.0                                 # s; merge same-class detections closer than this
+  thresholds: null                                 # per-class prob thresholds; null -> tuned on valid
+  tune_thresholds: true
+
+eval:
+  tolerance: 30.0                                  # +-T s for event-level matching
+  balanced_neg_ratio: 1.0                          # extra "balanced" segment metrics (comparable to the reference)
+
+logging:
+  wandb: false                                     # Weights & Biases tracking (needs WANDB_API_KEY); no-op when off/unavailable
+  project: football-highlight
+  entity: null                                     # W&B team/user, e.g. vubkk67-hanoi-university-of-science-and-technology
+  group: null                                      # runs of one notebook session share a group
+  name_prefix: run                                 # run name = <prefix>_<run>_<model>_len<max_length>_ep<epochs>

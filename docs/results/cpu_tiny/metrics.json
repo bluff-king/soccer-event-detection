@@ -1,0 +1,1759 @@
+{
+ "thresholds": {
+  "Goal": 0.7,
+  "Card": 0.65,
+  "Penalty": 0.05
+ },
+ "offsets": {
+  "Goal": 5.0,
+  "Card": 5.0,
+  "Penalty": 5.0
+ },
+ "smoothing": 1,
+ "nms_window": 30.0,
+ "tolerance": 30.0,
+ "valid": {
+  "segment_argmax": {
+   "accuracy": 0.8822724992312796,
+   "macro_f1": 0.30852884695169414,
+   "highlight_precision": 0.09572532969531605,
+   "highlight_recall": 0.31231454005934717,
+   "highlight_f1": 0.1465367211973547,
+   "highlight_macro_f1": 0.09889444815123254,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.9762836540203645,
+     "recall": 0.9015543174555372,
+     "f1": 0.9374320433530788,
+     "support": 119538
+    },
+    "Goal": {
+     "precision": 0.08441943127962086,
+     "recall": 0.3247863247863248,
+     "f1": 0.13400728811566945,
+     "support": 1755
+    },
+    "Card": {
+     "precision": 0.10757528717789507,
+     "recall": 0.3334937439846006,
+     "f1": 0.16267605633802817,
+     "support": 2078
+    },
+    "Penalty": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 211
+    }
+   },
+   "confusion_matrix": [
+    [
+     107770,
+     6038,
+     5730,
+     0
+    ],
+    [
+     1168,
+     570,
+     17,
+     0
+    ],
+    [
+     1288,
+     97,
+     693,
+     0
+    ],
+    [
+     162,
+     47,
+     2,
+     0
+    ]
+   ]
+  },
+  "segment_thresholded": {
+   "accuracy": 0.945938728941108,
+   "macro_f1": 0.30835644370079457,
+   "highlight_precision": 0.13267485317672184,
+   "highlight_recall": 0.12289812067260139,
+   "highlight_f1": 0.12759948652118103,
+   "highlight_macro_f1": 0.08695188480193611,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.9713608598417838,
+     "recall": 0.9737823955562248,
+     "f1": 0.9725701203973699,
+     "support": 119538
+    },
+    "Goal": {
+     "precision": 0.10823373173970784,
+     "recall": 0.09287749287749288,
+     "f1": 0.09996933455995094,
+     "support": 1755
+    },
+    "Card": {
+     "precision": 0.16104146576663453,
+     "recall": 0.16073147256977863,
+     "f1": 0.16088631984585738,
+     "support": 2078
+    },
+    "Penalty": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 211
+    }
+   },
+   "confusion_matrix": [
+    [
+     116404,
+     1311,
+     1740,
+     83
+    ],
+    [
+     1509,
+     163,
+     0,
+     83
+    ],
+    [
+     1729,
+     15,
+     334,
+     0
+    ],
+    [
+     194,
+     17,
+     0,
+     0
+    ]
+   ]
+  },
+  "segment_balanced_argmax": {
+   "accuracy": 0.6085558852621167,
+   "macro_f1": 0.4005684434372342,
+   "highlight_precision": 0.6974047487575925,
+   "highlight_recall": 0.31231454005934717,
+   "highlight_f1": 0.4314261315115286,
+   "highlight_macro_f1": 0.29774465067541184,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.5829217779193883,
+     "recall": 0.9047972304648862,
+     "f1": 0.7090398217227013,
+     "support": 4044
+    },
+    "Goal": {
+     "precision": 0.6462585034013606,
+     "recall": 0.3247863247863248,
+     "f1": 0.43230944254835046,
+     "support": 1755
+    },
+    "Card": {
+     "precision": 0.7459634015069968,
+     "recall": 0.3334937439846006,
+     "f1": 0.460924509477885,
+     "support": 2078
+    },
+    "Penalty": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 211
+    }
+   },
+   "confusion_matrix": [
+    [
+     3659,
+     168,
+     217,
+     0
+    ],
+    [
+     1168,
+     570,
+     17,
+     0
+    ],
+    [
+     1288,
+     97,
+     693,
+     0
+    ],
+    [
+     162,
+     47,
+     2,
+     0
+    ]
+   ]
+  },
+  "event": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.165625,
+    "recall": 0.3642611683848797,
+    "f1": 0.22771213748657357,
+    "tp": 106,
+    "fp": 534,
+    "fn": 185
+   },
+   "Card": {
+    "precision": 0.3286290322580645,
+    "recall": 0.5141955835962145,
+    "f1": 0.4009840098400984,
+    "tp": 163,
+    "fp": 333,
+    "fn": 154
+   },
+   "Penalty": {
+    "precision": 0.01020408163265306,
+    "recall": 0.034482758620689655,
+    "f1": 0.015748031496062992,
+    "tp": 1,
+    "fp": 97,
+    "fn": 28
+   },
+   "overall": {
+    "precision": 0.2188006482982172,
+    "recall": 0.423861852433281,
+    "f1": 0.28861571352218063,
+    "tp": 270,
+    "fp": 964,
+    "fn": 367
+   },
+   "macro_f1": 0.214814726274245
+  },
+  "event_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.07104913678618859,
+    "recall": 0.36769759450171824,
+    "f1": 0.11908736783528104,
+    "tp": 107,
+    "fp": 1399,
+    "fn": 184
+   },
+   "Card": {
+    "precision": 0.08148505303760849,
+    "recall": 0.5331230283911672,
+    "f1": 0.14136344625679634,
+    "tp": 169,
+    "fp": 1905,
+    "fn": 148
+   },
+   "Penalty": {
+    "precision": 0.006024096385542169,
+    "recall": 0.034482758620689655,
+    "f1": 0.010256410256410256,
+    "tp": 1,
+    "fp": 165,
+    "fn": 28
+   },
+   "overall": {
+    "precision": 0.07394554191137213,
+    "recall": 0.434850863422292,
+    "f1": 0.12639744467259867,
+    "tp": 277,
+    "fp": 3469,
+    "fn": 360
+   },
+   "macro_f1": 0.09023574144949588
+  },
+  "event_argmax_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.03273104265402844,
+    "recall": 0.7594501718213058,
+    "f1": 0.06275734772114155,
+    "tp": 221,
+    "fp": 6531,
+    "fn": 70
+   },
+   "Card": {
+    "precision": 0.039273517541136296,
+    "recall": 0.7981072555205048,
+    "f1": 0.07486314543571534,
+    "tp": 253,
+    "fp": 6189,
+    "fn": 64
+   },
+   "Penalty": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 29
+   },
+   "overall": {
+    "precision": 0.035925420645748066,
+    "recall": 0.7441130298273155,
+    "f1": 0.06854168172944834,
+    "tp": 474,
+    "fp": 12720,
+    "fn": 163
+   },
+   "macro_f1": 0.0458734977189523
+  },
+  "fp_diagnosis": {
+   "n_detections": 1234,
+   "n_false_positives": 964,
+   "groups": {
+    "replay_recall": {
+     "count": 442,
+     "share": 0.45850622406639
+    },
+    "other": {
+     "count": 311,
+     "share": 0.32261410788381745
+    },
+    "time_offset": {
+     "count": 96,
+     "share": 0.0995850622406639
+    },
+    "wrong_class": {
+     "count": 66,
+     "share": 0.06846473029045644
+    },
+    "keyword_no_event": {
+     "count": 36,
+     "share": 0.03734439834024896
+    },
+    "duplicate": {
+     "count": 13,
+     "share": 0.013485477178423237
+    }
+   },
+   "examples": {
+    "other": [
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 940.6,
+      "cls": "Card",
+      "confidence": 0.724,
+      "text": "There's Trippier too. | Tripier and Jones. | And a little further back, Arfiel."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 2,
+      "time": 658.0,
+      "cls": "Card",
+      "confidence": 0.674,
+      "text": "Back with Mertesacker. | Cazorla. | Kostienli."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 255.6,
+      "cls": "Card",
+      "confidence": 0.658,
+      "text": "And he knows what he wants. | Yeah, it's that attention to detail he was talking about overseas, | everything that happens at this football club."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 965.2,
+      "cls": "Card",
+      "confidence": 0.657,
+      "text": "De Puy. | Here's Mata. | Damian goes outside him."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 1195.2,
+      "cls": "Goal",
+      "confidence": 0.788,
+      "text": "A little bit left with Shaw. | And here comes Mata! | And here comes Mata!"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 1198.2,
+      "cls": "Penalty",
+      "confidence": 0.056,
+      "text": "And here comes Mata! | And here comes Mata! | And here comes Mata!"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 1239.2,
+      "cls": "Goal",
+      "confidence": 0.782,
+      "text": "Rooney. | Shit! | And he's kept it in only for Ashley Williams' benefit."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 1754.2,
+      "cls": "Card",
+      "confidence": 0.702,
+      "text": "referee allowed this challenge | to go really | because he's overrun it"
+     }
+    ],
+    "replay_recall": [
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 1762.3,
+      "cls": "Card",
+      "confidence": 0.717,
+      "text": "Minute 30. | From this first part. | Cazorla."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 2061.2,
+      "cls": "Card",
+      "confidence": 0.78,
+      "text": "Well, let's see. | Mee was with yellow cardboard. | He committed that foul on Giroud."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 492.0,
+      "cls": "Goal",
+      "confidence": 0.714,
+      "text": "and won the game, one nil up, away to Aston Villa, and won the game. | They lead one nil here. | Here's the man who supplied it."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 1561.0,
+      "cls": "Goal",
+      "confidence": 0.732,
+      "text": "Just to consolidate this lead. | Dummies. | Nicely done by Kee."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 2528.0,
+      "cls": "Goal",
+      "confidence": 0.739,
+      "text": "Fernandes, and Rooney's away! | Williams gets back. | Manchester United fans hollering,"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 824.0,
+      "cls": "Goal",
+      "confidence": 0.753,
+      "text": "Swamp, Swamp! | This time he\u2019s caught on his left foot. | And it woke up, that\u2019s for sure, the King Power Stadium which was just waiting for that."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 1322.0,
+      "cls": "Goal",
+      "confidence": 0.789,
+      "text": "with the center of Albrecht, | ton! | It\u2019s about Petr Cech."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 2590.4,
+      "cls": "Goal",
+      "confidence": 0.744,
+      "text": "Is it obviously going to dive towards Chek? | Olbrighton and Morgana! | It was exactly that at the far post."
+     }
+    ],
+    "wrong_class": [
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 2473.2,
+      "cls": "Goal",
+      "confidence": 0.713,
+      "text": "To lead go some number of free | kicks. | In those."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 1969.0,
+      "cls": "Penalty",
+      "confidence": 0.068,
+      "text": "in a touch for Wattap. | Alexis Sanchez! | First goal for the Chileans this season."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 2111.0,
+      "cls": "Penalty",
+      "confidence": 0.061,
+      "text": "Oh the cramp the goal! | And here he is the man of the match. | It\u2019s Alexis Sanchez who scores a hat-trick."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-12-26 - 18-00 Chelsea 2 - 2 Watford",
+      "half": 2,
+      "time": 2051.1,
+      "cls": "Goal",
+      "confidence": 0.784,
+      "text": "Which way will he go this time? | Come on! | Oscar against Gomez."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-02-13 - 20-30 Chelsea 5 - 1 Newcastle Utd",
+      "half": 1,
+      "time": 968.3,
+      "cls": "Penalty",
+      "confidence": 0.061,
+      "text": "It's Willian who picks it up, and it's Willian who scores! | A superb breakaway goal, Chelsea three up, | not even 17 minutes on the clock."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-02-13 - 20-30 Chelsea 5 - 1 Newcastle Utd",
+      "half": 2,
+      "time": 2637.1,
+      "cls": "Penalty",
+      "confidence": 0.061,
+      "text": "They can! | And a fine goal it was for Andros Townsend. | His first in a Newcastle shirt."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-02-27 - 18-00 Southampton 1 - 2 Chelsea",
+      "half": 2,
+      "time": 1768.5,
+      "cls": "Penalty",
+      "confidence": 0.054,
+      "text": "Stays in play, Fabregas. | Oh, it's all the way in! | And finally, Southampton concede a goal."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-03-20 - 19-00 Manchester City 0 - 1 Manchester United",
+      "half": 2,
+      "time": 1831.5,
+      "cls": "Goal",
+      "confidence": 0.725,
+      "text": "They need to get that back,aa! | Yes, that's it, man. | They need to do something, to do something."
+     }
+    ],
+    "time_offset": [
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 257.0,
+      "cls": "Goal",
+      "confidence": 0.709,
+      "text": "And ended up losing 2-1. | Good play. | Here from Payew."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 953.0,
+      "cls": "Goal",
+      "confidence": 0.704,
+      "text": "Well could history repeat itself? | He wasn't a Swansea player back in February... | when they came from 1-0 down to win 2-1 against Manchester United."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 1107.0,
+      "cls": "Goal",
+      "confidence": 0.773,
+      "text": "Just before, you're right that it could have made it 2-0 for Leicester. | Because Vardy still misses a great opportunity. | What a game !"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Manchester United 3 - 0 Sunderland",
+      "half": 1,
+      "time": 2932.5,
+      "cls": "Goal",
+      "confidence": 0.717,
+      "text": "It's not been great from Man United. | And have the lead. | Well it couldn't have been waited."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-02-27 - 18-00 Southampton 1 - 2 Chelsea",
+      "half": 1,
+      "time": 2570.3,
+      "cls": "Goal",
+      "confidence": 0.765,
+      "text": "into your teammate there. | Just clear your lines, make sure you go in at half-time, | 0-0, and you can play from there."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-03-05 - 18-00 Manchester City 4 - 0 Aston Villa",
+      "half": 2,
+      "time": 110.5,
+      "cls": "Goal",
+      "confidence": 0.712,
+      "text": "today is\u0430\u043d | this is David Silva | Messi 9-2IE"
+     },
+     {
+      "game": "england_epl/2015-2016/2016-03-20 - 19-00 Manchester City 0 - 1 Manchester United",
+      "half": 1,
+      "time": 651.1,
+      "cls": "Card",
+      "confidence": 0.677,
+      "text": "Damien on the cover. | So, yeah. | Keep City going forward."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-03-20 - 19-00 Manchester City 0 - 1 Manchester United",
+      "half": 2,
+      "time": 1765.3,
+      "cls": "Card",
+      "confidence": 0.678,
+      "text": "the hard part you might say, it's just a lack of confidence, I think, for me. | I'm Navas, never any conviction. | In the shot."
+     }
+    ],
+    "keyword_no_event": [
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Manchester United 3 - 0 Sunderland",
+      "half": 1,
+      "time": 906.6,
+      "cls": "Card",
+      "confidence": 0.703,
+      "text": "And it's another one isn't it? | Unus Kabul and Costel Pantelimon. | How is he going to card him here I wonder?"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-12-26 - 18-00 Chelsea 2 - 2 Watford",
+      "half": 1,
+      "time": 525.9,
+      "cls": "Card",
+      "confidence": 0.693,
+      "text": "Ivanovic just got in front of the ball. | Maybe a touch in front of him. | Well Chelsea you were asking why there was no yellow card there for Kaput."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-02-27 - 18-00 Southampton 1 - 2 Chelsea",
+      "half": 1,
+      "time": 601.3,
+      "cls": "Goal",
+      "confidence": 0.725,
+      "text": "Oscar, oh, brilliant turn, away from Van Dijk, | who's stretched out, and he's got it. | And it's a goal."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-03-05 - 18-00 Manchester City 4 - 0 Aston Villa",
+      "half": 1,
+      "time": 515.1,
+      "cls": "Card",
+      "confidence": 0.751,
+      "text": "if he gets away without a booking, | because he's nowhere near the ball coming through the back of Aguero, | who's going nowhere, it's a silly challenge,"
+     },
+     {
+      "game": "england_epl/2015-2016/2016-03-05 - 18-00 Manchester City 4 - 0 Aston Villa",
+      "half": 2,
+      "time": 1133.1,
+      "cls": "Card",
+      "confidence": 0.689,
+      "text": "and it was a silly red card against West Ham United a few weeks ago. | Aston Villa missed him. | Still the VAR."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-04-23 - 17-00 Bournemouth 1 - 4 Chelsea",
+      "half": 1,
+      "time": 1483.0,
+      "cls": "Card",
+      "confidence": 0.689,
+      "text": "That's a foul for me. | You can't really make the challenges like that. | No yellow, though."
+     },
+     {
+      "game": "europe_uefa-champions-league/2014-2015/2015-03-11 - 22-45 Bayern Munich 7 - 0 Shakhtar Donetsk",
+      "half": 2,
+      "time": 1371.6,
+      "cls": "Card",
+      "confidence": 0.671,
+      "text": "which is good news for Shakhtar. | Yellow card for him. | In the bath."
+     },
+     {
+      "game": "europe_uefa-champions-league/2014-2015/2015-04-21 - 21-45 Barcelona 2 - 0 Paris SG",
+      "half": 2,
+      "time": 534.0,
+      "cls": "Card",
+      "confidence": 0.755,
+      "text": "Busquets. | Struck down by Verratti who's only just back from a Champions League suspension. | Gets away without a card this time."
+     }
+    ],
+    "duplicate": [
+     {
+      "game": "europe_uefa-champions-league/2014-2015/2014-11-05 - 22-45 Ajax 0 - 2 Barcelona",
+      "half": 1,
+      "time": 2687.0,
+      "cls": "Card",
+      "confidence": 0.718,
+      "text": "He's doubly angry. | First of all, he thought he got the ball, and secondly, | he didn't think it was worthy of a yellow card."
+     },
+     {
+      "game": "europe_uefa-champions-league/2014-2015/2014-11-05 - 22-45 Ajax 0 - 2 Barcelona",
+      "half": 2,
+      "time": 1497.0,
+      "cls": "Card",
+      "confidence": 0.688,
+      "text": "Starts this run virtually inside his own half | and was taken out in full flight. | The card is coming."
+     },
+     {
+      "game": "europe_uefa-champions-league/2016-2017/2016-09-28 - 21-45 Napoli 4 - 2 Benfica",
+      "half": 2,
+      "time": 749.5,
+      "cls": "Goal",
+      "confidence": 0.736,
+      "text": "4-0! | How Decibel Bellini doesn't break his voice, I don't know. | This is some kind of special talent."
+     },
+     {
+      "game": "europe_uefa-champions-league/2016-2017/2016-10-19 - 21-45 Paris SG 3 - 0 Basel",
+      "half": 2,
+      "time": 1786.5,
+      "cls": "Card",
+      "confidence": 0.67,
+      "text": "No, it\u2019s Verratti. | Magic. | Marco Verratti and referee\u2019s whistle for previous contact."
+     },
+     {
+      "game": "italy_serie-a/2016-2017/2016-09-18 - 21-45 Fiorentina 1 - 0 AS Roma",
+      "half": 1,
+      "time": 1826.0,
+      "cls": "Card",
+      "confidence": 0.754,
+      "text": "Costs. | Costs. | Costs."
+     },
+     {
+      "game": "spain_laliga/2014-2015/2015-04-11 - 21-00 Sevilla 2 - 2 Barcelona",
+      "half": 2,
+      "time": 1017.0,
+      "cls": "Card",
+      "confidence": 0.69,
+      "text": "The referee understands that this is necessarily Cardboard. | And I say I understand the referee because... | The level of the cards today seems a little easy to me."
+     },
+     {
+      "game": "spain_laliga/2016-2017/2016-10-02 - 21-45 Celta Vigo 4 - 3 Barcelona",
+      "half": 2,
+      "time": 1681.6,
+      "cls": "Card",
+      "confidence": 0.651,
+      "text": "They have Yago Aspas short. | Gerard Piqu\u00e9, referee, comes in, he's going to show you the card. | Vicente Garrido is going to show you the yellow card for that entry."
+     },
+     {
+      "game": "spain_laliga/2016-2017/2017-01-07 - 15-00 Real Madrid 5 - 0 Granada CF",
+      "half": 1,
+      "time": 2597.4,
+      "cls": "Card",
+      "confidence": 0.673,
+      "text": "You were very close. | The play continues and ends in a foul. A foul from which Isco himself is quite sore. | And it will be the first yellow card for Samper."
+     }
+    ]
+   },
+   "missed_events": 367
+  },
+  "n_gt_events": 637
+ },
+ "test": {
+  "segment_argmax": {
+   "accuracy": 0.9000632934956625,
+   "macro_f1": 0.3166599125256475,
+   "highlight_precision": 0.11199584559459927,
+   "highlight_recall": 0.2793006691128858,
+   "highlight_f1": 0.15988138629764628,
+   "highlight_macro_f1": 0.10636911025204936,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.9742465842709445,
+     "recall": 0.9222439882155142,
+     "f1": 0.947532319346442,
+     "support": 129662
+    },
+    "Goal": {
+     "precision": 0.08790204678362573,
+     "recall": 0.2678173719376392,
+     "f1": 0.13236103467253715,
+     "support": 1796
+    },
+    "Card": {
+     "precision": 0.13367313383755344,
+     "recall": 0.3097142857142857,
+     "f1": 0.1867462960836109,
+     "support": 2625
+    },
+    "Penalty": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 212
+    }
+   },
+   "confusion_matrix": [
+    [
+     119580,
+     4877,
+     5205,
+     0
+    ],
+    [
+     1255,
+     481,
+     60,
+     0
+    ],
+    [
+     1763,
+     49,
+     813,
+     0
+    ],
+    [
+     143,
+     65,
+     4,
+     0
+    ]
+   ]
+  },
+  "segment_thresholded": {
+   "accuracy": 0.955002047730742,
+   "macro_f1": 0.32846461226462237,
+   "highlight_precision": 0.21361058601134217,
+   "highlight_recall": 0.12195121951219512,
+   "highlight_f1": 0.15526243473481727,
+   "highlight_macro_f1": 0.11219408094585788,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.969897455374098,
+     "recall": 0.9847680893399763,
+     "f1": 0.977276206220916,
+     "support": 129662
+    },
+    "Goal": {
+     "precision": 0.14068745003996802,
+     "recall": 0.09799554565701558,
+     "f1": 0.11552346570397112,
+     "support": 1796
+    },
+    "Card": {
+     "precision": 0.3112368633791431,
+     "recall": 0.14666666666666667,
+     "f1": 0.1993785603314345,
+     "support": 2625
+    },
+    "Penalty": {
+     "precision": 0.025477707006369428,
+     "recall": 0.018867924528301886,
+     "f1": 0.021680216802168018,
+     "support": 212
+    }
+   },
+   "confusion_matrix": [
+    [
+     127687,
+     1057,
+     842,
+     76
+    ],
+    [
+     1537,
+     176,
+     7,
+     76
+    ],
+    [
+     2232,
+     7,
+     385,
+     1
+    ],
+    [
+     194,
+     11,
+     3,
+     4
+    ]
+   ]
+  },
+  "segment_balanced_argmax": {
+   "accuracy": 0.6005827757392618,
+   "macro_f1": 0.3808658768527228,
+   "highlight_precision": 0.7055616139585605,
+   "highlight_recall": 0.2793006691128858,
+   "highlight_f1": 0.4001855574454925,
+   "highlight_macro_f1": 0.27182172169947233,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.5746770721205597,
+     "recall": 0.9218648823656378,
+     "f1": 0.707998342312474,
+     "support": 4633
+    },
+    "Goal": {
+     "precision": 0.6182519280205655,
+     "recall": 0.2678173719376392,
+     "f1": 0.37373737373737376,
+     "support": 1796
+    },
+    "Card": {
+     "precision": 0.7698863636363636,
+     "recall": 0.3097142857142857,
+     "f1": 0.44172779136104323,
+     "support": 2625
+    },
+    "Penalty": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 212
+    }
+   },
+   "confusion_matrix": [
+    [
+     4271,
+     183,
+     179,
+     0
+    ],
+    [
+     1255,
+     481,
+     60,
+     0
+    ],
+    [
+     1763,
+     49,
+     813,
+     0
+    ],
+    [
+     143,
+     65,
+     4,
+     0
+    ]
+   ]
+  },
+  "event": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.16583747927031509,
+    "recall": 0.33783783783783783,
+    "f1": 0.22246941045606228,
+    "tp": 100,
+    "fp": 503,
+    "fn": 196
+   },
+   "Card": {
+    "precision": 0.3996415770609319,
+    "recall": 0.5533498759305211,
+    "f1": 0.4640998959417274,
+    "tp": 223,
+    "fp": 335,
+    "fn": 180
+   },
+   "Penalty": {
+    "precision": 0.023529411764705882,
+    "recall": 0.05714285714285714,
+    "f1": 0.03333333333333334,
+    "tp": 2,
+    "fp": 83,
+    "fn": 33
+   },
+   "overall": {
+    "precision": 0.2608346709470305,
+    "recall": 0.4427792915531335,
+    "f1": 0.32828282828282823,
+    "tp": 325,
+    "fp": 921,
+    "fn": 409
+   },
+   "macro_f1": 0.239967546577041
+  },
+  "event_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.08073541167066348,
+    "recall": 0.34121621621621623,
+    "f1": 0.13057530704589532,
+    "tp": 101,
+    "fp": 1150,
+    "fn": 195
+   },
+   "Card": {
+    "precision": 0.18674211802748586,
+    "recall": 0.5732009925558312,
+    "f1": 0.28170731707317076,
+    "tp": 231,
+    "fp": 1006,
+    "fn": 172
+   },
+   "Penalty": {
+    "precision": 0.012738853503184714,
+    "recall": 0.05714285714285714,
+    "f1": 0.020833333333333332,
+    "tp": 2,
+    "fp": 155,
+    "fn": 33
+   },
+   "overall": {
+    "precision": 0.12627599243856333,
+    "recall": 0.4550408719346049,
+    "f1": 0.19769162474104765,
+    "tp": 334,
+    "fp": 2311,
+    "fn": 400
+   },
+   "macro_f1": 0.14437198581746646
+  },
+  "event_argmax_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.0360014619883041,
+    "recall": 0.6655405405405406,
+    "f1": 0.06830790568654646,
+    "tp": 197,
+    "fp": 5275,
+    "fn": 99
+   },
+   "Card": {
+    "precision": 0.052943110818809605,
+    "recall": 0.7990074441687345,
+    "f1": 0.09930609097918273,
+    "tp": 322,
+    "fp": 5760,
+    "fn": 81
+   },
+   "Penalty": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 35
+   },
+   "overall": {
+    "precision": 0.044919508395360914,
+    "recall": 0.7070844686648501,
+    "f1": 0.08447265625,
+    "tp": 519,
+    "fp": 11035,
+    "fn": 215
+   },
+   "macro_f1": 0.05587133222190973
+  },
+  "fp_diagnosis": {
+   "n_detections": 1246,
+   "n_false_positives": 921,
+   "groups": {
+    "replay_recall": {
+     "count": 402,
+     "share": 0.4364820846905538
+    },
+    "other": {
+     "count": 294,
+     "share": 0.31921824104234525
+    },
+    "time_offset": {
+     "count": 103,
+     "share": 0.11183496199782844
+    },
+    "wrong_class": {
+     "count": 76,
+     "share": 0.08251900108577633
+    },
+    "keyword_no_event": {
+     "count": 35,
+     "share": 0.038002171552660155
+    },
+    "duplicate": {
+     "count": 11,
+     "share": 0.011943539630836048
+    }
+   },
+   "examples": {
+    "other": [
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 825.0,
+      "cls": "Goal",
+      "confidence": 0.703,
+      "text": "Today the game is being dominated by United, | because Arsenal considers that 0-0 is worth it. | That's true, it's worth it."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 2134.6,
+      "cls": "Card",
+      "confidence": 0.659,
+      "text": "That's why there was a Naples, let him tell you. | Exactly. | It could also be the third Italy."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 249.6,
+      "cls": "Goal",
+      "confidence": 0.775,
+      "text": "He continues to see them coming. | It started like this, drawing 0-0, and now it continues like this, losing 1-0. | There is no reaction from Arsenal."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 1481.2,
+      "cls": "Goal",
+      "confidence": 0.786,
+      "text": "hoisted another one! | Ah, don't debate! | Juan S\u00e1nchez, I am also a firewood of the people."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 1622.9,
+      "cls": "Card",
+      "confidence": 0.663,
+      "text": "Or Cazorla? | No, Cazorla, I think so. | Let's see, or is it heading, yes."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 1881.9,
+      "cls": "Goal",
+      "confidence": 0.725,
+      "text": "I also think he's going to leave. | It's the ball for Phil Jones. | Victor Valdez!"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 1,
+      "time": 513.0,
+      "cls": "Goal",
+      "confidence": 0.777,
+      "text": "he can thread those passes through. | Ripped him by the collar off! | Diego Costa."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 73.2,
+      "cls": "Goal",
+      "confidence": 0.789,
+      "text": "Liverpool can collar off. | It's been a nightmare for Begovic, and that Chelsea back four. | Yes!"
+     }
+    ],
+    "wrong_class": [
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 1,
+      "time": 1954.0,
+      "cls": "Goal",
+      "confidence": 0.724,
+      "text": "And he knows the player he's playing against is strong and he will go down. | There's just absolutely no need off the back of going 1-0 up. | There's just absolutely no need off the back of going 1-0 up."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 2153.4,
+      "cls": "Goal",
+      "confidence": 0.747,
+      "text": "It's almost as if he catches you out. | Rolled into a false sense of security, takes the free kick himself. | And then shoots!"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-29 - 17-00 Liverpool 0 - 3 West Ham",
+      "half": 1,
+      "time": 1708.7,
+      "cls": "Card",
+      "confidence": 0.675,
+      "text": "Incredible. | We said about it. | Don't do anything stupid to make it go to two nil."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-29 - 17-00 Liverpool 0 - 3 West Ham",
+      "half": 2,
+      "time": 401.4,
+      "cls": "Goal",
+      "confidence": 0.746,
+      "text": "That is incredible. | We just said about Liverpool, don't self-implode. | We said it at 1-0."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 19-30 Newcastle Utd 2 - 2 Chelsea",
+      "half": 1,
+      "time": 2483.0,
+      "cls": "Card",
+      "confidence": 0.731,
+      "text": "They were grabbing. | That's what the public protests. | The possible grab of Gary Cahill."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 19-30 Newcastle Utd 2 - 2 Chelsea",
+      "half": 2,
+      "time": 2436.8,
+      "cls": "Card",
+      "confidence": 0.721,
+      "text": "Let's see the foul in the minute now | 40 of this second part | William goes for the free kick"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-10-03 - 19-30 Chelsea 1 - 3 Southampton",
+      "half": 1,
+      "time": 2482.5,
+      "cls": "Penalty",
+      "confidence": 0.059,
+      "text": "Pel\u00e9 with the chest down for Davies! | What a hit! | And Chelsea stunned so close to half-time with a goal from Steven Davies."
+     },
+     {
+      "game": "england_epl/2016-2017/2016-08-27 - 14-30 Tottenham 1 - 1 Liverpool",
+      "half": 2,
+      "time": 2373.5,
+      "cls": "Goal",
+      "confidence": 0.785,
+      "text": "Come on! | Here's Henderson. | What are you doing, man?!"
+     }
+    ],
+    "replay_recall": [
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 84.3,
+      "cls": "Penalty",
+      "confidence": 0.057,
+      "text": "Yes! | Delivery has been fantastic in the first half, Alex Collorough. | Just too high."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 800.7,
+      "cls": "Card",
+      "confidence": 0.681,
+      "text": "I thought it was probably a yellow. | The benefit of the doubt, he was jumping for the ball. | The only red was the blood."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 2624.5,
+      "cls": "Card",
+      "confidence": 0.788,
+      "text": "There's a look at the referee, I think he... | He was in trouble then. | Yeah, he uses the yellow card."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 1866.0,
+      "cls": "Goal",
+      "confidence": 0.726,
+      "text": "Chelsea tied, sweeping forward. | Oh, yeah! | Now the Albion have to be careful,"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 2342.0,
+      "cls": "Goal",
+      "confidence": 0.776,
+      "text": "Pedro's still on his feet. | Willian! | That's it."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 2,
+      "time": 674.1,
+      "cls": "Card",
+      "confidence": 0.699,
+      "text": "No, yeah. | It's over. | Similarly....."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 2,
+      "time": 989.7,
+      "cls": "Goal",
+      "confidence": 0.748,
+      "text": "Difficult at times, I'm sure. | Just conscious of it. | Yes!"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 2,
+      "time": 1039.1,
+      "cls": "Goal",
+      "confidence": 0.788,
+      "text": "Pedro. | West Brom a little stretched here. | And it's Costa!"
+     }
+    ],
+    "time_offset": [
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 2,
+      "time": 439.1,
+      "cls": "Card",
+      "confidence": 0.657,
+      "text": "Street Fighter yeah | I like that about him John I just think if he starts doing that it's not putting | your face into on your opponent then you run the risk of getting a red card"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-29 - 17-00 Liverpool 0 - 3 West Ham",
+      "half": 2,
+      "time": 2056.3,
+      "cls": "Card",
+      "confidence": 0.722,
+      "text": "which it seemed to be, | I didn't see a flash of his second yellow card and then a red. | I think the lunge comes from his desperation to close the ball down."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-29 - 17-00 Liverpool 0 - 3 West Ham",
+      "half": 2,
+      "time": 2090.8,
+      "cls": "Card",
+      "confidence": 0.689,
+      "text": "Incredibly, that is West Ham's sixth red card this season alone. | Hooked in by Moreno, away by Reid. | Sixth in ten games between the Europa League and the Premier League."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-20 - 18-00 Southampton 2 - 3 Manchester United",
+      "half": 2,
+      "time": 260.8,
+      "cls": "Goal",
+      "confidence": 0.715,
+      "text": "And the... | ...sweet. | Oh, that's that kind of mistake."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-20 - 18-00 Southampton 2 - 3 Manchester United",
+      "half": 2,
+      "time": 379.0,
+      "cls": "Goal",
+      "confidence": 0.721,
+      "text": "They lead Norwich early in the second half. | And Antwill... | ...is a great defender."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 19-30 Newcastle Utd 2 - 2 Chelsea",
+      "half": 2,
+      "time": 900.8,
+      "cls": "Goal",
+      "confidence": 0.723,
+      "text": "Keyhill leaves with Mitrovic, who by the way is grabbing him | And Quignaldum finishes off the 2-0 with pleasure | Oh..."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-11-07 - 20-30 Stoke City 1 - 0 Chelsea",
+      "half": 1,
+      "time": 2745.9,
+      "cls": "Card",
+      "confidence": 0.744,
+      "text": "Great drop and turn. | And has slid through and. | No complaints about getting a yellow there."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-11-07 - 20-30 Stoke City 1 - 0 Chelsea",
+      "half": 2,
+      "time": 528.7,
+      "cls": "Goal",
+      "confidence": 0.785,
+      "text": "And they're in the lead. | And they're in the lead. | And they're in the lead."
+     }
+    ],
+    "keyword_no_event": [
+     {
+      "game": "england_epl/2015-2016/2015-11-08 - 19-00 Arsenal 1 - 1 Tottenham",
+      "half": 1,
+      "time": 2171.5,
+      "cls": "Card",
+      "confidence": 0.721,
+      "text": "We're going to wait for the ball to go out and see what happens, because obviously it stops. | Showing yellow cannot stop the game. Let's see now. Now he will call his | I send to Coquelin, to Giroud, first to Giroud. First to Giroud and Berton, what do I think?"
+     },
+     {
+      "game": "england_epl/2015-2016/2016-03-01 - 22-45 Norwich 1 - 2 Chelsea",
+      "half": 1,
+      "time": 218.8,
+      "cls": "Card",
+      "confidence": 0.75,
+      "text": "There you go, Costa. | That should be a booking. | Should be a booking for Russell Martin there, Bill,"
+     },
+     {
+      "game": "england_epl/2016-2017/2016-08-27 - 14-30 Tottenham 1 - 1 Liverpool",
+      "half": 1,
+      "time": 2093.3,
+      "cls": "Goal",
+      "confidence": 0.797,
+      "text": "Goal! | No, I agree. | He's been sent off six times in his career,"
+     },
+     {
+      "game": "england_epl/2016-2017/2016-08-27 - 14-30 Tottenham 1 - 1 Liverpool",
+      "half": 2,
+      "time": 458.4,
+      "cls": "Goal",
+      "confidence": 0.779,
+      "text": "Goal! | Milner back into the throw from Eriksen, | he's just calming things down,"
+     },
+     {
+      "game": "england_epl/2016-2017/2017-01-21 - 15-30 Liverpool 2 - 3 Swansea",
+      "half": 2,
+      "time": 926.7,
+      "cls": "Card",
+      "confidence": 0.744,
+      "text": "on a second yellow card there, I would keep him on the pitch. | I'll tell you where he could have gone, he could have moved out the way. | Trev, just get over it, Savage 1, Francis 0."
+     },
+     {
+      "game": "europe_uefa-champions-league/2014-2015/2015-03-17 - 22-45 Monaco 0 - 2 Arsenal",
+      "half": 1,
+      "time": 1287.8,
+      "cls": "Card",
+      "confidence": 0.697,
+      "text": "Picked up a yellow card for Descente near the end of the first leg | and it really just summed up his night. | Could that be Bono?"
+     },
+     {
+      "game": "europe_uefa-champions-league/2014-2015/2015-03-17 - 22-45 Monaco 0 - 2 Arsenal",
+      "half": 1,
+      "time": 1686.5,
+      "cls": "Goal",
+      "confidence": 0.768,
+      "text": "and Atletico Madrid have taken the lead on the night against Bayer Leverkusen, | and that tie is now locked at 1-1 on aggregate. | Goal!"
+     },
+     {
+      "game": "europe_uefa-champions-league/2015-2016/2015-11-03 - 22-45 Real Madrid 1 - 0 Paris SG",
+      "half": 2,
+      "time": 146.0,
+      "cls": "Card",
+      "confidence": 0.71,
+      "text": "Thiago Mota is complaining. Ramos asks him what's going on, Clatenburg. | Casemiro Rafa Guerrero comes late in that cross against the Italian-Brazilian. | Indeed, he comes in late and the yellow card has been played."
+     }
+    ],
+    "duplicate": [
+     {
+      "game": "england_epl/2015-2016/2016-03-01 - 22-45 Norwich 1 - 2 Chelsea",
+      "half": 2,
+      "time": 1631.0,
+      "cls": "Card",
+      "confidence": 0.691,
+      "text": "this is better really push in that's it look really get after that ball see if Chelsea want to know | with a poor challenge you'll get a yellow card for that one | well"
+     },
+     {
+      "game": "europe_uefa-champions-league/2014-2015/2015-02-24 - 22-45 Manchester City 1 - 2 Barcelona",
+      "half": 1,
+      "time": 2414.5,
+      "cls": "Card",
+      "confidence": 0.676,
+      "text": "Ooh. | He hit his arm, there's no doubt about that. | Can he get out of the way of that?"
+     },
+     {
+      "game": "europe_uefa-champions-league/2016-2017/2017-03-08 - 22-45 Barcelona 6 - 1 Paris SG",
+      "half": 2,
+      "time": 1245.0,
+      "cls": "Card",
+      "confidence": 0.689,
+      "text": "Neymar in the middle. | Musquets. | The simulation. The referee is right."
+     },
+     {
+      "game": "europe_uefa-champions-league/2016-2017/2017-04-12 - 21-45 Bayern Munich 1 - 2 Real Madrid",
+      "half": 2,
+      "time": 1888.0,
+      "cls": "Goal",
+      "confidence": 0.747,
+      "text": "The Portuguese player is Real Madrid's second. | Repeat Cristiano Ronaldo. | Bayern Munich 1, Real Madrid 2."
+     },
+     {
+      "game": "italy_serie-a/2015-2016/2015-09-20 - 16-00 Genoa 0 - 2 Juventus",
+      "half": 2,
+      "time": 962.2,
+      "cls": "Card",
+      "confidence": 0.656,
+      "text": "And this card was Limina. | Another French midfielder, Juventus. | Meanwhile, Januan earns a free kick."
+     },
+     {
+      "game": "italy_serie-a/2016-2017/2017-02-07 - 22-45 AS Roma 4 - 0 Fiorentina",
+      "half": 1,
+      "time": 2109.0,
+      "cls": "Card",
+      "confidence": 0.709,
+      "text": "Well, in the end, he sent one of the three central defenders to a yellow card. | De Russi! The ball to captain Roma. And, of course, all attention to Jack. | Great game master on the second floor."
+     },
+     {
+      "game": "italy_serie-a/2016-2017/2017-02-07 - 22-45 AS Roma 4 - 0 Fiorentina",
+      "half": 1,
+      "time": 2473.0,
+      "cls": "Card",
+      "confidence": 0.68,
+      "text": "Borge Valera receives a yellow card. Spanish midfielder. | Of course, there can\u2019t even be two opinions here. | I just shot Borge Valer in the leg and broke the rules."
+     },
+     {
+      "game": "spain_laliga/2014-2015/2015-02-14 - 20-00 Real Madrid 2 - 0 Dep. La Coruna",
+      "half": 2,
+      "time": 2256.4,
+      "cls": "Card",
+      "confidence": 0.735,
+      "text": "it'll be a free kick | and a yellow card for Alberto Lopo | and again"
+     }
+    ]
+   },
+   "missed_events": 409
+  },
+  "n_gt_events": 734
+ },
+ "pr_curves_valid": {
+  "Goal": [
+   [
+    0.05,
+    0.03712905452035887,
+    0.9243986254295533
+   ],
+   [
+    0.1,
+    0.04688050757842792,
+    0.9140893470790378
+   ],
+   [
+    0.15,
+    0.05547226386806597,
+    0.8900343642611683
+   ],
+   [
+    0.2,
+    0.06411556006082109,
+    0.8694158075601375
+   ],
+   [
+    0.25,
+    0.07049608355091384,
+    0.8350515463917526
+   ],
+   [
+    0.3,
+    0.07619667860631717,
+    0.8041237113402062
+   ],
+   [
+    0.35,
+    0.08465804066543438,
+    0.7869415807560137
+   ],
+   [
+    0.4,
+    0.09456066945606695,
+    0.7766323024054983
+   ],
+   [
+    0.45,
+    0.10124164278892073,
+    0.7285223367697594
+   ],
+   [
+    0.5,
+    0.11247216035634744,
+    0.6941580756013745
+   ],
+   [
+    0.55,
+    0.1217906517445688,
+    0.6357388316151202
+   ],
+   [
+    0.6,
+    0.14110929853181076,
+    0.5945017182130584
+   ],
+   [
+    0.65,
+    0.15889830508474576,
+    0.5154639175257731
+   ],
+   [
+    0.7,
+    0.17921686746987953,
+    0.40893470790378006
+   ],
+   [
+    0.75,
+    0.23529411764705882,
+    0.2611683848797251
+   ],
+   [
+    0.8,
+    0.23076923076923078,
+    0.010309278350515464
+   ],
+   [
+    0.85,
+    0.0,
+    0.0
+   ],
+   [
+    0.9,
+    0.0,
+    0.0
+   ],
+   [
+    0.95,
+    0.0,
+    0.0
+   ]
+  ],
+  "Card": [
+   [
+    0.05,
+    0.03468141490955179,
+    0.9495268138801262
+   ],
+   [
+    0.1,
+    0.04169621330307758,
+    0.9274447949526814
+   ],
+   [
+    0.15,
+    0.04811226194453725,
+    0.9085173501577287
+   ],
+   [
+    0.2,
+    0.05646918961759461,
+    0.8990536277602523
+   ],
+   [
+    0.25,
+    0.06525777984208082,
+    0.886435331230284
+   ],
+   [
+    0.3,
+    0.07572443958447239,
+    0.8738170347003155
+   ],
+   [
+    0.35,
+    0.08842866535174228,
+    0.8485804416403786
+   ],
+   [
+    0.4,
+    0.10613397901533494,
+    0.8296529968454258
+   ],
+   [
+    0.45,
+    0.13128205128205128,
+    0.807570977917981
+   ],
+   [
+    0.5,
+    0.15779092702169625,
+    0.7570977917981072
+   ],
+   [
+    0.55,
+    0.19327006039689387,
+    0.7066246056782335
+   ],
+   [
+    0.6,
+    0.2558714462299135,
+    0.6529968454258676
+   ],
+   [
+    0.65,
+    0.3286290322580645,
+    0.5141955835962145
+   ],
+   [
+    0.7,
+    0.42160278745644597,
+    0.38170347003154576
+   ],
+   [
+    0.75,
+    0.45112781954887216,
+    0.1892744479495268
+   ],
+   [
+    0.8,
+    1.0,
+    0.015772870662460567
+   ],
+   [
+    0.85,
+    0.0,
+    0.0
+   ],
+   [
+    0.9,
+    0.0,
+    0.0
+   ],
+   [
+    0.95,
+    0.0,
+    0.0
+   ]
+  ],
+  "Penalty": [
+   [
+    0.05,
+    0.01809954751131222,
+    0.13793103448275862
+   ],
+   [
+    0.1,
+    0.0,
+    0.0
+   ],
+   [
+    0.15,
+    0.0,
+    0.0
+   ],
+   [
+    0.2,
+    0.0,
+    0.0
+   ],
+   [
+    0.25,
+    0.0,
+    0.0
+   ],
+   [
+    0.3,
+    0.0,
+    0.0
+   ],
+   [
+    0.35,
+    0.0,
+    0.0
+   ],
+   [
+    0.4,
+    0.0,
+    0.0
+   ],
+   [
+    0.45,
+    0.0,
+    0.0
+   ],
+   [
+    0.5,
+    0.0,
+    0.0
+   ],
+   [
+    0.55,
+    0.0,
+    0.0
+   ],
+   [
+    0.6,
+    0.0,
+    0.0
+   ],
+   [
+    0.65,
+    0.0,
+    0.0
+   ],
+   [
+    0.7,
+    0.0,
+    0.0
+   ],
+   [
+    0.75,
+    0.0,
+    0.0
+   ],
+   [
+    0.8,
+    0.0,
+    0.0
+   ],
+   [
+    0.85,
+    0.0,
+    0.0
+   ],
+   [
+    0.9,
+    0.0,
+    0.0
+   ],
+   [
+    0.95,
+    0.0,
+    0.0
+   ]
+  ]
+ },
+ "train_time_s": 1055.7107467651367,
+ "n_train": 64260,
+ "train_class_counts": {
+  "No-Event": 51408,
+  "Goal": 5237,
+  "Card": 7109,
+  "Penalty": 506
+ },
+ "train_source_counts": {
+  "echoes": 64260
+ }
+}

@@ -1,0 +1,18 @@
+# CPU sanity run on the FULL real data with a small randomly initialised transformer (no download).
+# Not a substitute for the xlm-roberta baseline; shows the pipeline learns beyond keyword spotting.
+_base_: base.yaml
+output_dir: outputs/cpu_tiny
+run_name: cpu_tiny
+model:
+  name: tiny-local
+  max_length: 96
+  tiny_hidden: 128
+  tiny_layers: 2
+  tiny_vocab: 8000
+train:
+  epochs: 3
+  batch_size: 64
+  eval_batch_size: 512
+  lr: 5.0e-4
+  num_workers: 0
+  select_eval_negatives: 20000

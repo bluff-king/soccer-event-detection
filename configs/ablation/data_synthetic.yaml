@@ -1,0 +1,6 @@
+# Echoes + synthetic paraphrases
+_base_: ../base.yaml
+output_dir: outputs/data_synthetic
+run_name: data_synthetic
+sources:
+  synthetic: {enabled: true}

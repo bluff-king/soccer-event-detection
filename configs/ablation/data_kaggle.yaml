@@ -1,0 +1,6 @@
+# Echoes + Kaggle Football Events (masked)
+_base_: ../base.yaml
+output_dir: outputs/data_kaggle
+run_name: data_kaggle
+sources:
+  kaggle: {enabled: true}

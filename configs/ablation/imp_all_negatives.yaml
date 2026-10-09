@@ -1,0 +1,6 @@
+# all ~380k No-Event training windows (no negative subsampling): precision-oriented, ~5x slower
+_base_: ../base.yaml
+output_dir: outputs/imp_all_negatives
+run_name: imp_all_negatives
+data:
+  train_neg_ratio: null

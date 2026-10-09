@@ -1,0 +1,7 @@
+# class-specific delay windows from the delay profile
+# NOTE: labels change -> compare on EVENT-level metrics only
+_base_: ../base.yaml
+output_dir: outputs/imp_class_delays
+run_name: imp_class_delays
+data:
+  delay_per_class: {Goal: [-5, 25], Card: [-15, 15], Penalty: [-60, 5]}

@@ -1,0 +1,78 @@
+seed: 42
+output_dir: outputs/cpu_tiny
+data:
+  raw_root: data/raw
+  echoes_root: data/raw/sn-echoes
+  mirror_root: data/raw/sn-echoes-sushant
+  lang_csv: data/raw/sn-echoes-sushant/SN-echoes-lang.csv
+  official_root: data/raw/soccernet
+  label_source: auto
+  asr_variant: auto_en
+  processed_dir: data/processed
+  split_method: official
+  max_games: null
+  dedupe_window: 5.0
+  delay_min: -5.0
+  delay_max: 15.0
+  delay_per_class: null
+  ctx_before: 1
+  ctx_after: 1
+  train_neg_ratio: 4.0
+  keep_keyword_negatives: true
+sources:
+  caption:
+    enabled: false
+    style: sentence_window
+  kaggle:
+    enabled: false
+    max_per_class: 20000
+    neg_per_pos: 1.0
+    mask: true
+  synthetic:
+    enabled: false
+    backend: template
+    backend_kwargs: null
+    targets:
+      Penalty: 3000
+      Goal: 1000
+      Card: 1000
+    per_call: 5
+    noise: true
+  hardneg:
+    enabled: false
+    per_category: 300
+    mined_max: 5000
+    mined_min_gap: 120.0
+model:
+  name: tiny-local
+  max_length: 96
+  tiny_hidden: 128
+  tiny_layers: 2
+  tiny_vocab: 8000
+train:
+  epochs: 3
+  batch_size: 64
+  eval_batch_size: 512
+  lr: 0.0005
+  weight_decay: 0.01
+  warmup_ratio: 0.06
+  grad_accum: 1
+  fp16: true
+  loss: ce
+  class_weights: null
+  focal_gamma: 2.0
+  sampler: none
+  max_steps: null
+  eval_every: null
+  select_eval_negatives: 20000
+  num_workers: 0
+  select_metric: highlight_f1
+postprocess:
+  smoothing: 1
+  nms_window: 30.0
+  thresholds: null
+  tune_thresholds: true
+eval:
+  tolerance: 30.0
+  balanced_neg_ratio: 1.0
+run_name: cpu_tiny

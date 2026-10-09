@@ -1,0 +1,11 @@
+# post-processing of the best single model (data_hardneg): probability smoothing (3 segments) + 45 s NMS.
+# Same model as data_hardneg, so its saved predictions are re-evaluated (seconds, no training).
+_base_: ../base.yaml
+output_dir: outputs/imp_hardneg_smoothing
+run_name: imp_hardneg_smoothing
+reuse_probs_from: outputs/data_hardneg
+sources:
+  hardneg: {enabled: true}
+postprocess:
+  smoothing: 3
+  nms_window: 45.0
