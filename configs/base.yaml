@@ -30,6 +30,7 @@ sources:                                           # external data, TRAIN ONLY
                                                    # mode en = English text only, all = + native-language originals
   caption: {enabled: false, style: sentence_window}
   kaggle: {enabled: false, max_per_class: 20000, neg_per_pos: 1.0, mask: true}
+  livetext: {enabled: false, noise_frac: 0.5, penalty_lead_min: 2.0}   # real live-text (HF, PL 2024-25)
   synthetic:
     enabled: false
     backend: template                              # template (offline) | hf (local LLM, Colab) | anthropic

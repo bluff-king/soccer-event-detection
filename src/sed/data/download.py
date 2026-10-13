@@ -6,6 +6,7 @@ Sources (pinned commits for reproducibility):
 * Labels-v2 + Caption mirror    — github.com/SoccerNet/sn-echoes (sushant)    summaries/ + SN-echoes-lang.csv
 * Kaggle Football Events        — Kaggle API if credentials exist, else a public GitHub mirror of the
                                   same zip (github.com/DakshS07/xG_Football, Football_events.zip)
+* Live-text commentary          — huggingface.co/datasets/falahmanalodi/Football-Commentary (MIT, pinned revision)
 * Official Labels-v2 / Labels-caption (optional, ``--official``) — SoccerNet pip package downloader.
 
 Usage:  python -m sed.data.download --root data/raw [--official] [--skip-kaggle]
@@ -26,6 +27,8 @@ ECHOES_SUSHANT_COMMIT = "b3565c116ef5a287106e5fe7b47cf626921534c8"
 KAGGLE_DATASET = "secareanualin/football-events"
 KAGGLE_MIRROR_URL = "https://github.com/DakshS07/xG_Football"
 KAGGLE_MIRROR_COMMIT = "c477b072c8d308d01df52926a8f8bdbda7b2481a"
+LIVETEXT_REPO = "falahmanalodi/Football-Commentary"
+LIVETEXT_FILES = ["data/train-00000-of-00001.parquet", "data/test-00000-of-00001.parquet", "README.md"]
 
 
 def _run(cmd: list[str], cwd: Path | None = None) -> None:
@@ -82,16 +85,36 @@ def download_kaggle(root: Path) -> None:
     shutil.rmtree(tmp, ignore_errors=True)
 
 
+def download_livetext(root: Path, revision: str = "main") -> None:
+    """Public parquet files over plain HTTPS (no Hugging Face login needed)."""
+    import urllib.request
+
+    dest = root / "hf_football_commentary"
+    dest.mkdir(parents=True, exist_ok=True)
+    for f in LIVETEXT_FILES:
+        out = dest / Path(f).name
+        if out.exists():
+            print(f"[skip] {out} exists")
+            continue
+        url = f"https://huggingface.co/datasets/{LIVETEXT_REPO}/resolve/{revision}/{f}"
+        print("+ GET", url, flush=True)
+        urllib.request.urlretrieve(url, out)
+
+
 def download_official(root: Path, splits=("train", "valid", "test")) -> None:
     """Official Labels-v2.json and Labels-caption.json via the SoccerNet package (needs network
     access to the SoccerNet servers; works on Colab)."""
-    from SoccerNet.Downloader import SoccerNetDownloader
+    import SoccerNet.Downloader as snd
+    import SoccerNet.utils as snu
 
-    dl = SoccerNetDownloader(LocalDirectory=str(root / "soccernet"))
+    # the package joins game paths with os.sep, which breaks its Hugging Face file filter on Windows
+    snd.getListGames = lambda *a, **k: [g.replace(os.sep, "/") for g in snu.getListGames(*a, **k)]
+    dl = snd.SoccerNetDownloader(LocalDirectory=str(root / "soccernet"))
     # Recent SoccerNet versions download from Hugging Face (may need `huggingface-cli login` and accepting the
     # dataset terms). On failure the pipeline keeps using the GitHub mirror (label_source: auto).
+    # Labels-caption.json per game (downloadDataTask(task="caption-2023") would also pull ~8 GB of video features)
     for what, fn in (("Labels-v2", lambda: dl.downloadGames(files=["Labels-v2.json"], split=list(splits))),
-                     ("Labels-caption", lambda: dl.downloadDataTask(task="caption-2023", split=list(splits)))):
+                     ("Labels-caption", lambda: dl.downloadGames(files=["Labels-caption.json"], split=list(splits)))):
         try:
             fn()
         except Exception as e:  # pragma: no cover - network dependent
@@ -110,6 +133,7 @@ def main(argv=None) -> None:
     download_mirror(root)
     if not args.skip_kaggle:
         download_kaggle(root)
+    download_livetext(root)
     if args.official:
         download_official(root)
     print("done ->", root.resolve())

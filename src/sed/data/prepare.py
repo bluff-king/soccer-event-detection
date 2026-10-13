@@ -3,6 +3,7 @@
     echoes_{train,valid,test}.jsonl   Echoes windows (natural distribution)
     caption.jsonl                     SoccerNet-Caption samples (train games only)
     asr_views.jsonl                   other Whisper transcripts of the train games (real ASR, same labels)
+    livetext.jsonl                    real live-text commentary (HF Football-Commentary, PL 2024-25)
     kaggle.jsonl                      Kaggle Football Events (masked, overlapping valid/test games removed)
     synthetic.jsonl / hardneg.jsonl   generated samples (source + meta per sample)
     manifest.json                     games per split, counts per source/class, leakage checks
@@ -21,6 +22,7 @@ from pathlib import Path
 from ..labels import CLASSES
 from ..sources.asr_views import load_asr_views
 from ..sources.caption import load_caption_samples
+from ..sources.livetext import load_livetext_samples, summarize as livetext_summary
 from ..sources.kaggle_events import load_kaggle_samples, overlapping_kaggle_games
 from ..sources.synthetic import SynthConfig, generate_hard_negatives, generate_synthetic, mine_echoes_hard_negatives
 from .build import build_echoes, class_counts, load_jsonl, save_jsonl, subsample_negatives
@@ -58,9 +60,9 @@ def processed(cfg: dict, name: str) -> Path:
 
 def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
     """Build every file. ``sources`` limits which external sources are (re)built
-    (default: all of asr_views, caption, kaggle, synthetic, hardneg)."""
+    (default: all of asr_views, caption, kaggle, livetext, synthetic, hardneg)."""
     d = cfg["data"]
-    sources = sources if sources is not None else ["asr_views", "caption", "kaggle", "synthetic", "hardneg"]
+    sources = sources if sources is not None else ["asr_views", "caption", "kaggle", "livetext", "synthetic", "hardneg"]
     seed = cfg.get("seed", 42)
     b = build_echoes(cfg)
     split_games = {s: sorted({g.game for g in b.games if g.split == s}) for s in SPLITS}
@@ -107,6 +109,15 @@ def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
             save_jsonl(ks, processed(cfg, "kaggle.jsonl"))
             manifest["counts"]["kaggle"] = class_counts(ks)
             manifest["kaggle_games_removed_overlap_valid_test"] = len(excl)
+
+    if "livetext" in sources:
+        lroot = Path(d["raw_root"]) / "hf_football_commentary"
+        if any(lroot.glob("*.parquet")):
+            lc = cfg["sources"].get("livetext", {})
+            lt = load_livetext_samples(lroot, seed, lc.get("noise_frac", 0.5), lc.get("penalty_lead_min", 2.0))
+            save_jsonl(lt, processed(cfg, "livetext.jsonl"))
+            manifest["counts"]["livetext"] = class_counts(lt)
+            manifest["livetext"] = livetext_summary(lt)
 
     sc = cfg["sources"].get("synthetic", {})
     synth_cfg = SynthConfig(backend=sc.get("backend", "template"), targets=sc.get("targets"),
@@ -186,7 +197,7 @@ def assemble_train(cfg: dict) -> list[Sample]:
     train = load_split(cfg, "train")
     train = subsample_negatives(train, d.get("train_neg_ratio"), seed, d.get("keep_keyword_negatives", True))
     valid_test_games = {s.game for sp in ("valid", "test") for s in load_split(cfg, sp)}
-    for name in ("asr_views", "caption", "kaggle", "synthetic", "hardneg"):
+    for name in ("asr_views", "caption", "kaggle", "livetext", "synthetic", "hardneg"):
         sc = cfg["sources"].get(name, {})
         if not sc.get("enabled"):
             continue

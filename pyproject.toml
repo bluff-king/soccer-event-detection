@@ -20,6 +20,7 @@ dependencies = [
   "protobuf",
   "tokenizers",
   "SoccerNet>=0.1.60",
+  "pyarrow",
 ]
 
 [project.optional-dependencies]
