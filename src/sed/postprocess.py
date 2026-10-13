@@ -84,12 +84,17 @@ def detect_events(meta: list[dict], probs: np.ndarray, thresholds: dict[str, flo
     return nms_1d(cands, nms_window)
 
 
+# 0.05 steps, then a finer tail: a confident model (late checkpoint, more data) can need thresholds above 0.95,
+# and a grid capped at 0.95 then admits several times more false positives (v2_baseline: 692 vs 132 Goal FP)
+THRESHOLD_GRID = np.round(np.r_[np.arange(0.05, 0.96, 0.05), [0.97, 0.98, 0.99, 0.995, 0.998, 0.999]], 3)
+
+
 def tune_thresholds(meta: list[dict], probs: np.ndarray, gts: list[GTEvent], tolerance: float, smoothing: int,
                     nms_window: float, offsets: dict[str, float] | None = None,
                     grid: np.ndarray | None = None) -> dict[str, float]:
     """Per-class threshold maximising event-level F1 on validation (classes tuned independently;
     other classes disabled with threshold > 1 while tuning one)."""
-    grid = grid if grid is not None else np.round(np.arange(0.05, 0.96, 0.05), 2)
+    grid = grid if grid is not None else THRESHOLD_GRID
     best = {}
     for c in EVENT_CLASSES:
         scores = []
@@ -106,7 +111,7 @@ def pr_curve_points(meta: list[dict], probs: np.ndarray, gts: list[GTEvent], tol
                     nms_window: float, offsets: dict[str, float] | None = None,
                     grid: np.ndarray | None = None) -> dict[str, list[tuple[float, float, float]]]:
     """Event-level (threshold, precision, recall) per class."""
-    grid = grid if grid is not None else np.round(np.arange(0.05, 0.96, 0.05), 2)
+    grid = grid if grid is not None else THRESHOLD_GRID
     out = {}
     for c in EVENT_CLASSES:
         pts = []

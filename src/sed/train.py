@@ -29,6 +29,10 @@ from .model.predict import get_device, predict_probs
 from .tracking import Tracker
 
 
+# coarser than the final grid (tuned once per evaluation during training), with the high tail
+SELECT_GRID = np.round(np.r_[np.arange(0.1, 0.91, 0.1), [0.95, 0.98, 0.99, 0.995]], 3)
+
+
 def make_sampler(cfg: dict, labels: list[str]):
     kind = cfg["train"].get("sampler", "none")
     if kind == "none":
@@ -57,7 +61,20 @@ def train(cfg: dict) -> dict:
     if not valid_samples or not any(s.source == "echoes" for s in train_samples):
         raise RuntimeError(f"no Echoes train/valid data in {cfg['data']['processed_dir']} (cwd {Path.cwd()}); "
                            "run scripts/prepare_data.py from the repository root first")
-    if tr.get("select_eval_negatives"):
+    select_gts = None
+    if tr.get("select_games"):
+        # model selection on whole validation games (every window, natural distribution) scored with the full
+        # event pipeline (thresholds tuned on these games, smoothing, NMS, +-T matching): the segment-level F1 of a
+        # shuffled subset is a poor proxy for event-level F1 (a later, more confident checkpoint can win on segments
+        # and fire on post-goal chatter)
+        from .data.prepare import load_events
+
+        games = sorted({s.game for s in valid_samples})
+        rng = np.random.default_rng(cfg.get("seed", 42))
+        keep_games = set(rng.choice(games, size=min(tr["select_games"], len(games)), replace=False).tolist())
+        valid_samples = [s for s in valid_samples if s.game in keep_games]
+        select_gts = [g for g in load_events(cfg, "valid") if g.game in keep_games]
+    elif tr.get("select_eval_negatives"):
         # per-epoch model selection on all validation positives + a fixed random subset of negatives
         # (the final evaluation always uses the full validation/test sets)
         rng = np.random.default_rng(cfg.get("seed", 42))
@@ -127,6 +144,22 @@ def train(cfg: dict) -> dict:
         y = np.array([LABEL2ID[s.label] for s in valid_samples])
         m = segment_metrics(y, probs.argmax(1))
         val_loss = float(-np.log(np.clip(probs[np.arange(len(y)), y], 1e-8, 1.0)).mean())
+        evt = {}
+        if select_gts is not None:
+            from .data.prepare import class_offsets
+            from .evaluate import _meta
+            from .metrics import event_metrics
+            from .postprocess import detect_events, tune_thresholds
+
+            pp, tol = cfg["postprocess"], cfg["eval"]["tolerance"]
+            meta, offs = _meta(valid_samples), class_offsets(cfg)
+            thr = tune_thresholds(meta, probs, select_gts, tol, pp["smoothing"], pp["nms_window"], offs, SELECT_GRID)
+            em = event_metrics(detect_events(meta, probs, thr, pp["smoothing"], pp["nms_window"], offs), select_gts, tol)
+            evt = {"event_f1": em["overall"]["f1"], "event_precision": em["overall"]["precision"],
+                   "event_recall": em["overall"]["recall"],
+                   "event_macro_f1": float(np.mean([em[c]["f1"] for c in ("Goal", "Card", "Penalty")])),
+                   **{f"event_f1_{c}": em[c]["f1"] for c in ("Goal", "Card", "Penalty")}}
+            m.update(evt)
         rec = {"step": step, "tag": tag, "epoch": round(step / steps_per_epoch, 3),
                "elapsed_s": round(time.time() - t0, 1),
                "train_samples_per_s": round(step * tr["batch_size"] * tr.get("grad_accum", 1)
@@ -134,7 +167,7 @@ def train(cfg: dict) -> dict:
                "gpu_peak_mem_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0,
                "loss": round(val_loss, 5),
                **{k: m[k] for k in ("accuracy", "macro_f1", "highlight_f1", "highlight_precision", "highlight_recall")},
-               **{f"f1_{c}": m["per_class"][c]["f1"] for c in m["per_class"]}}
+               **{f"f1_{c}": m["per_class"][c]["f1"] for c in m["per_class"]}, **evt}
         history.append(rec)
         log = {f"val/{k}": v for k, v in rec.items() if k not in ("step", "tag", "epoch", "elapsed_s",
                                                                    "train_samples_per_s", "gpu_peak_mem_gb")}
@@ -143,7 +176,7 @@ def train(cfg: dict) -> dict:
 
             cm_path = out / "val_cm" / f"step{step:06d}.png"
             cm_path.parent.mkdir(exist_ok=True)
-            _plot_cm(m["confusion_matrix"], cm_path, f"valid (selection subset), step {step}")
+            _plot_cm(m["confusion_matrix"], cm_path, f"valid (selection set), step {step}")
             log["val/confusion"] = tracker.image(cm_path)
         tracker.log(log, step=step)
         print(f"[eval] {json.dumps(rec)}", flush=True)
