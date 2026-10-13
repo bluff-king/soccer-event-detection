@@ -15,6 +15,11 @@ class _Run:
         self.logged, self.summary_data = [], {}
         self.summary = types.SimpleNamespace(update=self.summary_data.update)
 
+        self.metrics = {}
+
+    def define_metric(self, name, step_metric=None):
+        self.metrics[name] = step_metric
+
     def log(self, data, step=None):
         self.logged.append((step, data))
 
@@ -43,8 +48,9 @@ def _cfg(**logging):
             "train": {"epochs": 5}, "logging": logging}
 
 
-def test_disabled_or_missing_key_is_noop(monkeypatch):
+def test_disabled_or_missing_key_is_noop(monkeypatch, tmp_path):
     _fake_wandb(monkeypatch)
+    monkeypatch.chdir(tmp_path)  # no .env here
     monkeypatch.delenv("WANDB_API_KEY", raising=False)
     monkeypatch.delenv("WANDB_MODE", raising=False)
     for t in (Tracker(_cfg(wandb=False)), Tracker(_cfg(wandb=True))):
@@ -68,6 +74,23 @@ def test_logs_results_and_name(monkeypatch):
     assert s["test/event/Penalty/f1"] == res["test"]["event"]["Penalty"]["f1"]
     assert s["summary/evt_f1"] == row["evt_f1"] and "thresholds/Goal" in s and "valid/fp/replay_recall" in s
     logged = {k for _, d in wb.run.logged for k in d}
-    assert {"train/loss", "results_table", "pr_curves_valid", "confusion_valid"} <= logged
+    assert {"train/loss", "final/results_table", "final/pr_curves_valid", "final/confusion_valid"} <= logged
+    # every chart shares the optimizer-step x-axis
+    assert wb.run.metrics["*"] == "trainer/global_step"
+    assert wb.run.logged[0] == (None, {"train/loss": 0.5, "trainer/global_step": 50})
     t.finish()
     assert t.run is None
+
+
+def test_dotenv_fills_missing_variables_only(monkeypatch, tmp_path):
+    from sed.tracking import load_dotenv
+
+    (tmp_path / ".env").write_text("# comment\nSED_TEST_A='from-file'\nSED_TEST_B=from-file\nSED_TEST_C=\n")
+    monkeypatch.setenv("SED_TEST_B", "from-env")
+    monkeypatch.delenv("SED_TEST_A", raising=False)
+    monkeypatch.delenv("SED_TEST_C", raising=False)
+    load_dotenv(tmp_path / ".env")
+    import os
+
+    assert os.environ["SED_TEST_A"] == "from-file" and os.environ["SED_TEST_B"] == "from-env"
+    assert "SED_TEST_C" not in os.environ

@@ -43,6 +43,12 @@ def build_model_and_tokenizer(cfg: dict, train_texts: list[str] | None = None):
     tok = AutoTokenizer.from_pretrained(name)
     model = AutoModelForSequenceClassification.from_pretrained(name, num_labels=len(LABEL2ID), id2label=ID2LABEL,
                                                                label2id=LABEL2ID)
+    if cfg["model"].get("freeze_embeddings"):
+        # the 250k-token word embedding is ~70% of xlm-roberta-base; freezing it removes its gradients and AdamW
+        # states (~3 GB), which is what makes fine-tuning fit on a 4 GB GPU
+        model.get_input_embeddings().weight.requires_grad_(False)
+    if cfg["model"].get("gradient_checkpointing"):
+        model.gradient_checkpointing_enable()
     return model, tok
 
 

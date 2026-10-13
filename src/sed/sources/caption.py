@@ -26,7 +26,10 @@ from .text_utils import asr_normalize, split_sentences, strip_scores
 
 _CAP_LINE = re.compile(r"^(\d+):(\d\d) Caption: (.+)$")
 _HALF_HDR = {"First Half:": 1, "Second Half:": 2}
-OFFICIAL_MAP = {"goal": "Goal", "y-card": "Card", "r-card": "Card", "yr-card": "Card", "penalty": "Penalty"}
+# official Labels-caption.json label names (counts over the 471 games: soccer-ball 1,399, y-card 1,907, penalty 148,
+# penalty-missed 47, ...). Labels-v2 "Penalty" is the kick whether scored or missed, so both map to Penalty.
+OFFICIAL_MAP = {"goal": "Goal", "soccer-ball": "Goal", "soccer-ball-own": "Goal", "y-card": "Card", "r-card": "Card",
+                "yr-card": "Card", "penalty": "Penalty", "penalty-missed": "Penalty"}
 
 
 def parse_mirror_captions(text: str) -> list[tuple[int, float, str]]:

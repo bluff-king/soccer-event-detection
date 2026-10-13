@@ -68,6 +68,9 @@ class Tracker:
             self.run = wandb.init(project=lg.get("project") or "football-highlight", entity=lg.get("entity") or None,
                                   group=lg.get("group") or None, name=run_display_name(cfg), job_type=job_type,
                                   config=cfg, dir=str(Path(cfg["output_dir"]).resolve()) if cfg.get("output_dir") else None, reinit="finish_previous")
+            # one shared x-axis: every chart is plotted against trainer/global_step (optimizer steps)
+            self.run.define_metric("trainer/global_step")
+            self.run.define_metric("*", step_metric="trainer/global_step")
             print(f"[wandb] logging to {self.run.url}", flush=True)
         except Exception as e:  # never let tracking break training
             print(f"[wandb] disabled: {e}", flush=True)
@@ -76,7 +79,7 @@ class Tracker:
     def log(self, data: dict, step: int | None = None) -> None:
         if self.run is not None:
             try:
-                self.run.log(data, step=step)
+                self.run.log({**data, "trainer/global_step": step} if step is not None else data)
             except Exception as e:  # pragma: no cover
                 print(f"[wandb] log failed: {e}", flush=True)
 
@@ -86,6 +89,14 @@ class Tracker:
                 self.run.summary.update(data)
             except Exception as e:  # pragma: no cover
                 print(f"[wandb] summary failed: {e}", flush=True)
+
+    def image(self, fig_or_path) -> object | None:
+        """wandb.Image of a matplotlib figure or a png path (None when tracking is off)."""
+        if self.run is None:
+            return None
+        import wandb
+
+        return wandb.Image(fig_or_path if not isinstance(fig_or_path, Path) else str(fig_or_path))
 
     def log_results(self, res: dict, out_dir: str | Path, row: dict | None = None) -> None:
         """Final metrics of a run: scalars per split, the summary row as a table, and the figures."""
@@ -101,8 +112,8 @@ class Tracker:
         self.summary(data)
         if row:
             self.summary({f"summary/{k}": v for k, v in row.items() if k != "run"})
-            self.log({"results_table": wandb.Table(columns=list(row), data=[list(row.values())])})
-        imgs = {p.stem: wandb.Image(str(p)) for p in sorted(Path(out_dir).glob("*.png"))}
+            self.log({"final/results_table": wandb.Table(columns=list(row), data=[list(row.values())])})
+        imgs = {f"final/{p.stem}": wandb.Image(str(p)) for p in sorted(Path(out_dir).glob("*.png"))}
         if imgs:
             self.log(imgs)
 

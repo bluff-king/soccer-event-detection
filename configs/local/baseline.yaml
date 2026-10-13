@@ -1,0 +1,4 @@
+# Baseline (Echoes only) under the local recipe.
+_base_: base_local.yaml
+output_dir: outputs/local/baseline
+run_name: baseline

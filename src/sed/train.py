@@ -89,10 +89,10 @@ def train(cfg: dict) -> dict:
                                          generator=g, drop_last=False)
     loss_fn = build_loss(cfg, labels).to(device)
     no_decay = ("bias", "LayerNorm.weight", "layer_norm", "norm.weight")
+    named = [(n, p) for n, p in model.named_parameters() if p.requires_grad]  # skips frozen embeddings
     params = [
-        {"params": [p for n, p in model.named_parameters() if not any(k in n for k in no_decay)],
-         "weight_decay": tr.get("weight_decay", 0.01)},
-        {"params": [p for n, p in model.named_parameters() if any(k in n for k in no_decay)], "weight_decay": 0.0},
+        {"params": [p for n, p in named if not any(k in n for k in no_decay)], "weight_decay": tr.get("weight_decay", 0.01)},
+        {"params": [p for n, p in named if any(k in n for k in no_decay)], "weight_decay": 0.0},
     ]
     opt = torch.optim.AdamW(params, lr=float(tr["lr"]))
     steps_per_epoch = math.ceil(len(dl) / tr.get("grad_accum", 1))
@@ -109,23 +109,40 @@ def train(cfg: dict) -> dict:
     best, history, step = -1.0, [], 0
     patience = tr.get("early_stop_patience")  # evaluations without improvement before stopping (null = off)
     since_best = 0
+    log_every = tr.get("log_every", 10)
+    run_loss, run_n = 0.0, 0.0
     tracker = Tracker(cfg)
     tracker.summary({"n_train": len(train_samples), **{f"train_count/{k}": v for k, v in Counter(labels).items()}})
     t0 = time.time()
 
     def run_eval(tag: str):
         nonlocal best, since_best
+        if device == "cuda":  # release cached training activations so small GPUs do not spill during eval
+            torch.cuda.empty_cache()
         probs = predict_probs(model, tok, valid_samples, cfg["model"]["max_length"], tr["eval_batch_size"], device,
                               tr.get("fp16", True), ids=valid_ids)
         y = np.array([LABEL2ID[s.label] for s in valid_samples])
         m = segment_metrics(y, probs.argmax(1))
-        rec = {"step": step, "tag": tag, "elapsed_s": round(time.time() - t0, 1),
+        val_loss = float(-np.log(np.clip(probs[np.arange(len(y)), y], 1e-8, 1.0)).mean())
+        rec = {"step": step, "tag": tag, "epoch": round(step / steps_per_epoch, 3),
+               "elapsed_s": round(time.time() - t0, 1),
                "train_samples_per_s": round(step * tr["batch_size"] * tr.get("grad_accum", 1)
                                             / max(time.time() - t0, 1e-6), 1),
                "gpu_peak_mem_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0,
-               **{k: m[k] for k in ("accuracy", "macro_f1", "highlight_f1", "highlight_precision", "highlight_recall")}}
+               "loss": round(val_loss, 5),
+               **{k: m[k] for k in ("accuracy", "macro_f1", "highlight_f1", "highlight_precision", "highlight_recall")},
+               **{f"f1_{c}": m["per_class"][c]["f1"] for c in m["per_class"]}}
         history.append(rec)
-        tracker.log({f"valid_select/{k}": v for k, v in rec.items() if k not in ("step", "tag")}, step=step)
+        log = {f"val/{k}": v for k, v in rec.items() if k not in ("step", "tag", "epoch", "elapsed_s",
+                                                                   "train_samples_per_s", "gpu_peak_mem_gb")}
+        if tracker.run is not None:  # confusion matrix per evaluation (wandb shows a step slider)
+            from .evaluate import _plot_cm
+
+            cm_path = out / "val_cm" / f"step{step:06d}.png"
+            cm_path.parent.mkdir(exist_ok=True)
+            _plot_cm(m["confusion_matrix"], cm_path, f"valid (selection subset), step {step}")
+            log["val/confusion"] = tracker.image(cm_path)
+        tracker.log(log, step=step)
         print(f"[eval] {json.dumps(rec)}", flush=True)
         if m[select] > best:
             since_best = 0
@@ -145,6 +162,8 @@ def train(cfg: dict) -> dict:
                 logits = model(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).logits
             loss = loss_fn(logits.float(), b["labels"]) / tr.get("grad_accum", 1)
             scaler.scale(loss).backward()
+            run_loss += loss.item()  # already divided by grad_accum -> run_loss / run_n = mean loss per sample batch
+            run_n += 1 / tr.get("grad_accum", 1)
             if (i + 1) % tr.get("grad_accum", 1) == 0 or i + 1 == len(dl):
                 scaler.unscale_(opt)
                 torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -153,11 +172,17 @@ def train(cfg: dict) -> dict:
                 opt.zero_grad(set_to_none=True)
                 sched.step()
                 step += 1
-                if step % 50 == 0:
-                    tracker.log({"train/loss": loss.item() * tr.get("grad_accum", 1), "train/lr": sched.get_last_lr()[0],
-                                 "train/epoch": epoch}, step=step)
-                    print(f"[train] epoch={epoch} step={step}/{total} loss={loss.item() * tr.get('grad_accum', 1):.4f} "
-                          f"lr={sched.get_last_lr()[0]:.2e} {time.time() - t0:.0f}s", flush=True)
+                if step % log_every == 0:  # mean loss over the last log_every steps (a single batch is too noisy)
+                    avg = run_loss / max(run_n, 1)
+                    run_loss, run_n = 0.0, 0
+                    el = time.time() - t0
+                    tracker.log({"train/loss": avg, "train/lr": sched.get_last_lr()[0], "epoch": step / steps_per_epoch,
+                                 "train/samples_per_s": step * tr["batch_size"] * tr.get("grad_accum", 1) / max(el, 1e-6),
+                                 "train/gpu_mem_gb": torch.cuda.max_memory_allocated() / 2**30 if device == "cuda" else 0.0},
+                                step=step)
+                    if step % (log_every * 5) == 0:
+                        print(f"[train] epoch={epoch} step={step}/{total} loss={avg:.4f} "
+                              f"lr={sched.get_last_lr()[0]:.2e} {el:.0f}s", flush=True)
                 if step % eval_every == 0:
                     run_eval(f"epoch{epoch}")
                     if patience and since_best >= patience:
