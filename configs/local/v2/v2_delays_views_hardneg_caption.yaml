@@ -1,0 +1,6 @@
+# + official SoccerNet-Caption of the train games.
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/v2_delays_views_hardneg_caption
+run_name: v2_delays_views_hardneg_caption
+sources:
+  caption: {enabled: true}

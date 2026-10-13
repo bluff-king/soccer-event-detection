@@ -1,0 +1,9 @@
+# Per-class delay windows measured on the train games (README 2.2): share of events with a keyword segment
+# inside the window: Penalty 37% with [-5, 15] -> 87% with [-60, 5]; Card 58% -> 66% with [-15, 15].
+# Labels change -> compare on event-level metrics.
+_base_: base_v2.yaml
+output_dir: outputs/local/v2_delays
+run_name: v2_delays
+data:
+  processed_dir: data/processed_v2_cd
+  delay_per_class: {Goal: [-5, 15], Card: [-15, 15], Penalty: [-60, 5]}

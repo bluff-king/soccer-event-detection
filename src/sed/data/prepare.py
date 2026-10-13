@@ -27,6 +27,29 @@ from .build import build_echoes, class_counts, load_jsonl, save_jsonl, subsample
 from .types import Sample
 
 SPLITS = ("train", "valid", "test")
+# settings baked into the labels/windows of a processed dir: a config that differs in any of them needs its own
+# data.processed_dir (otherwise it would silently train on labels made with other settings)
+LABELING_KEYS = ("delay_min", "delay_max", "delay_per_class", "ctx_before", "ctx_after", "asr_variant", "label_source",
+                 "split_method", "max_games", "dedupe_window")
+
+
+def labeling_signature(cfg: dict) -> dict:
+    return {k: cfg["data"].get(k) for k in LABELING_KEYS}
+
+
+def check_labeling(cfg: dict) -> None:
+    """Raise if the processed dir was built with other labelling settings than ``cfg``."""
+    path = processed(cfg, "manifest.json")
+    if not path.exists():
+        return
+    built = json.loads(path.read_text()).get("labeling")
+    if built is None:  # built before the signature existed
+        return
+    want = labeling_signature(cfg)
+    diff = {k: (built.get(k), want[k]) for k in want if built.get(k) != want[k]}
+    if diff:
+        raise ValueError(f"{cfg['data']['processed_dir']} was prepared with other labelling settings "
+                         f"(built, wanted): {diff}. Set a separate data.processed_dir and run scripts/prepare_data.py")
 
 
 def processed(cfg: dict, name: str) -> Path:
@@ -42,7 +65,8 @@ def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
     b = build_echoes(cfg)
     split_games = {s: sorted({g.game for g in b.games if g.split == s}) for s in SPLITS}
     heldout = set(split_games["valid"]) | set(split_games["test"])
-    manifest: dict = {"games": {s: len(v) for s, v in split_games.items()}, "split_games": split_games,
+    manifest: dict = {"labeling": labeling_signature(cfg),
+                      "games": {s: len(v) for s, v in split_games.items()}, "split_games": split_games,
                       "label_duplicates_removed": b.n_label_duplicates, "counts": {}}
     for s in SPLITS:
         rows = [x for x in b.samples if x.split == s]
@@ -127,6 +151,7 @@ def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
 
 
 def load_split(cfg: dict, split: str) -> list[Sample]:
+    check_labeling(cfg)
     return load_jsonl(processed(cfg, f"echoes_{split}.jsonl"))
 
 

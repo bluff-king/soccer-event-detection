@@ -1,7 +1,11 @@
 # class-specific delay windows from the delay profile
-# NOTE: labels change -> compare on EVENT-level metrics only
+# NOTE: labels change -> compare on EVENT-level metrics only.
+# The labels are made by scripts/prepare_data.py, so this config needs its own processed dir (an earlier version
+# shared data/processed with the baseline: it trained on [-5, 15] labels but shifted Penalty times by the new
+# offset, which explains its Penalty F1 of 0).
 _base_: ../base.yaml
 output_dir: outputs/imp_class_delays
 run_name: imp_class_delays
 data:
+  processed_dir: data/processed_class_delays
   delay_per_class: {Goal: [-5, 25], Card: [-15, 15], Penalty: [-60, 5]}

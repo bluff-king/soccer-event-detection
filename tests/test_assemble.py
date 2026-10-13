@@ -40,3 +40,19 @@ def test_subsample_negatives_keeps_positives_and_keyword_negatives():
     assert sum(x.label == "Goal" for x in out) == 1
     assert any(x.seg_idx == 1 for x in out)  # keyword negative kept
     assert sum(x.label == "No-Event" for x in out) == 3
+
+
+def test_labeling_mismatch_is_rejected(tmp_path):
+    import json
+
+    import pytest
+
+    from sed.data.prepare import check_labeling, labeling_signature
+
+    cfg = {"data": {"processed_dir": str(tmp_path), "delay_min": -5.0, "delay_max": 15.0, "delay_per_class": None,
+                    "ctx_before": 1, "ctx_after": 1}}
+    (tmp_path / "manifest.json").write_text(json.dumps({"labeling": labeling_signature(cfg)}))
+    check_labeling(cfg)  # same settings: fine
+    other = {"data": {**cfg["data"], "delay_per_class": {"Penalty": [-60, 5]}}}
+    with pytest.raises(ValueError, match="delay_per_class"):
+        check_labeling(other)

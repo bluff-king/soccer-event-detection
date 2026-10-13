@@ -1,0 +1,6 @@
+# + the other Whisper transcripts (v1/v2/v3, English text) of the train games: real ASR, same labels.
+_base_: v2_delays.yaml
+output_dir: outputs/local/v2_delays_views
+run_name: v2_delays_views
+sources:
+  asr_views: {enabled: true}

@@ -1,0 +1,13 @@
+# v2 data: official SoccerNet Labels-v2 (466 games with transcripts: 283 / 90 / 93) instead of the GitHub mirror
+# (434 games). Checkpoint selection on highlight_macro_f1 (mean F1 of Goal/Card/Penalty on the validation
+# selection subset): the default highlight_f1 is micro-averaged, so Penalty (~3% of positives) barely moves it.
+_base_: ../base_local.yaml
+output_dir: outputs/local/v2_baseline
+run_name: v2_baseline
+data:
+  label_source: official
+  processed_dir: data/processed_v2
+train:
+  select_metric: highlight_macro_f1
+logging:
+  group: local-v2
