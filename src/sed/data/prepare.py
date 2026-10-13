@@ -2,6 +2,7 @@
 
     echoes_{train,valid,test}.jsonl   Echoes windows (natural distribution)
     caption.jsonl                     SoccerNet-Caption samples (train games only)
+    asr_views.jsonl                   other Whisper transcripts of the train games (real ASR, same labels)
     kaggle.jsonl                      Kaggle Football Events (masked, overlapping valid/test games removed)
     synthetic.jsonl / hardneg.jsonl   generated samples (source + meta per sample)
     manifest.json                     games per split, counts per source/class, leakage checks
@@ -18,6 +19,7 @@ from collections import Counter
 from pathlib import Path
 
 from ..labels import CLASSES
+from ..sources.asr_views import load_asr_views
 from ..sources.caption import load_caption_samples
 from ..sources.kaggle_events import load_kaggle_samples, overlapping_kaggle_games
 from ..sources.synthetic import SynthConfig, generate_hard_negatives, generate_synthetic, mine_echoes_hard_negatives
@@ -33,9 +35,9 @@ def processed(cfg: dict, name: str) -> Path:
 
 def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
     """Build every file. ``sources`` limits which external sources are (re)built
-    (default: all of caption, kaggle, synthetic, hardneg)."""
+    (default: all of asr_views, caption, kaggle, synthetic, hardneg)."""
     d = cfg["data"]
-    sources = sources if sources is not None else ["caption", "kaggle", "synthetic", "hardneg"]
+    sources = sources if sources is not None else ["asr_views", "caption", "kaggle", "synthetic", "hardneg"]
     seed = cfg.get("seed", 42)
     b = build_echoes(cfg)
     split_games = {s: sorted({g.game for g in b.games if g.split == s}) for s in SPLITS}
@@ -54,6 +56,14 @@ def prepare(cfg: dict, sources: list[str] | None = None) -> dict:
         p.write_text("".join(json.dumps(x) + "\n" for x in evs), encoding="utf-8")
 
     train_echoes = [x for x in b.samples if x.split == "train"]
+    if "asr_views" in sources:
+        av = load_asr_views(cfg, [g for g in b.games if g.split == "train"],
+                            cfg["sources"].get("asr_views", {}).get("mode", "en"))
+        assert not ({x.game for x in av} & heldout), "ASR-view leakage into valid/test"
+        save_jsonl(av, processed(cfg, "asr_views.jsonl"))
+        manifest["counts"]["asr_views"] = class_counts(av)
+        manifest["asr_views_variants"] = dict(Counter(x.meta["variant"] for x in av))
+
     if "caption" in sources:
         caps = load_caption_samples(split_games["train"], d.get("mirror_root"), d.get("official_root"),
                                     cfg["sources"]["caption"].get("style", "sentence_window"))
@@ -151,7 +161,7 @@ def assemble_train(cfg: dict) -> list[Sample]:
     train = load_split(cfg, "train")
     train = subsample_negatives(train, d.get("train_neg_ratio"), seed, d.get("keep_keyword_negatives", True))
     valid_test_games = {s.game for sp in ("valid", "test") for s in load_split(cfg, sp)}
-    for name in ("caption", "kaggle", "synthetic", "hardneg"):
+    for name in ("asr_views", "caption", "kaggle", "synthetic", "hardneg"):
         sc = cfg["sources"].get(name, {})
         if not sc.get("enabled"):
             continue
@@ -162,6 +172,8 @@ def assemble_train(cfg: dict) -> list[Sample]:
         leaked = {s.game for s in extra} & valid_test_games
         if leaked:
             raise AssertionError(f"{name}: {len(leaked)} valid/test games in external data")
+        if sc.get("neg_ratio"):  # natural-distribution sources (ASR views): same negative subsampling as Echoes
+            extra = subsample_negatives(extra, sc["neg_ratio"], seed, d.get("keep_keyword_negatives", True))
         if sc.get("max_samples"):
             random.Random(seed).shuffle(extra)
             extra = extra[: sc["max_samples"]]

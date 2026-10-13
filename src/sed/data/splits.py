@@ -19,7 +19,7 @@ def official_splits() -> dict[str, str] | None:
     out = {}
     for split in ("train", "valid", "test"):
         for g in getListGames(split):
-            out[g] = split
+            out[g.replace("\\", "/")] = split  # the package joins paths with os.sep ('\' on Windows)
     return out
 
 

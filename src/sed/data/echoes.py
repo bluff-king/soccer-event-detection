@@ -89,7 +89,7 @@ class EchoesCorpus:
                 continue
             for p in d.glob("*/*/*"):
                 if p.is_dir():
-                    games.add(str(p.relative_to(d)))
+                    games.add(p.relative_to(d).as_posix())  # '/' on every OS (game ids are matched as strings)
         return sorted(games)
 
     def lang(self, game: str, half: int) -> str:

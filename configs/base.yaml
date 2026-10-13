@@ -26,6 +26,8 @@ data:
   keep_keyword_negatives: true                     # never drop No-Event windows that mention goal/card/penalty
 
 sources:                                           # external data, TRAIN ONLY
+  asr_views: {enabled: false, mode: en, neg_ratio: 4.0}   # other Whisper transcripts of the train games (real ASR);
+                                                   # mode en = English text only, all = + native-language originals
   caption: {enabled: false, style: sentence_window}
   kaggle: {enabled: false, max_per_class: 20000, neg_per_pos: 1.0, mask: true}
   synthetic:

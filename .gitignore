@@ -13,3 +13,7 @@ __pycache__/
 *.onnx
 mlruns/
 docker/certs/*.crt
+
+# local secrets (WANDB_API_KEY, HF_TOKEN, ...)
+.env
+wandb/

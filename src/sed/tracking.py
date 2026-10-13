@@ -1,7 +1,8 @@
 """Optional Weights & Biases tracking. Disabled unless ``logging.wandb: true``; every call is a no-op
 when wandb is missing, no API key is configured or wandb fails, so training never depends on it.
 
-The API key is read by wandb from ``WANDB_API_KEY`` (the Colab notebook copies it from a Colab Secret).
+The API key is read by wandb from ``WANDB_API_KEY`` (the Colab notebook copies it from a Colab Secret; locally
+it can be put in a git-ignored ``.env`` file at the repo root, e.g. ``WANDB_API_KEY=...``).
 """
 
 from __future__ import annotations
@@ -10,6 +11,21 @@ import os
 from pathlib import Path
 
 from .labels import EVENT_CLASSES
+
+
+def load_dotenv(path: str | Path = ".env") -> None:
+    """Copy ``KEY=VALUE`` lines of ``path`` into the environment (existing variables win)."""
+    p = Path(path)
+    if not p.is_file():
+        return
+    for line in p.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        v = v.strip().strip('"').strip("'")
+        if v:
+            os.environ.setdefault(k.strip(), v)
 
 
 def run_display_name(cfg: dict) -> str:
@@ -42,6 +58,7 @@ class Tracker:
         lg = cfg.get("logging", {}) or {}
         if not lg.get("wandb"):
             return
+        load_dotenv()
         if not os.environ.get("WANDB_API_KEY") and os.environ.get("WANDB_MODE") not in ("offline", "disabled"):
             print("[wandb] logging.wandb is on but WANDB_API_KEY is not set -> not logging", flush=True)
             return
