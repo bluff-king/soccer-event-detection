@@ -164,8 +164,11 @@ def main(argv=None):
         del model
         gc.collect()
         torch.cuda.empty_cache()
-        full_ok = not r["train_full"].get("oom") and r["train_full"]["samples_per_s"] >= 0.5 * \
-            r["train_frozen_emb"]["samples_per_s"]
+        # full fine-tuning only when it fits in the card's memory (beyond that Windows spills into shared memory and
+        # both modes crawl; mmBERT-base: 6.1 GB full / 4.6 GB frozen on a 4 GB card) and is not much slower
+        vram = torch.cuda.get_device_properties(0).total_memory / 2**30
+        full_ok = not r["train_full"].get("oom") and r["train_full"]["peak_gb"] < vram and \
+            r["train_full"]["samples_per_s"] >= 0.5 * r["train_frozen_emb"]["samples_per_s"]
         r["finetune_freeze_embeddings"] = not full_ok  # freeze only when full fine-tuning spills/ooms
         r["finetune"] = short_finetune(cfg, name, amp, train, valid, a.steps, a.bs, a.lr, not full_ok)
         results[name] = r
