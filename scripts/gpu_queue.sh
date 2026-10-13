@@ -4,9 +4,17 @@
 # Each line of the queue file is a shell command; lines are executed in order, one at a time, and appended lines
 # are picked up while the queue runs. Finished lines are recorded in <queue>.done (with exit code and duration),
 # so the runner can be restarted without re-running them. Stops when a line "STOP" is reached.
+# To stop it cleanly, append "STOP" (the running job finishes first); killing only the runner leaves its child job.
 q=${1:-outputs/local/queue.txt}
 done_f="$q.done"
+lock="$q.lock"
 touch "$q" "$done_f"
+# one runner per queue file: two runners on one GPU both spill out of memory and crawl (seen: 20 s per step)
+if [ -f "$lock" ] && kill -0 "$(cat "$lock")" 2>/dev/null; then
+  echo "[queue] another runner (pid $(cat "$lock")) owns $q - exiting"; exit 1
+fi
+echo $$ > "$lock"
+trap 'rm -f "$lock"' EXIT
 i=0
 while true; do
   i=$((i + 1))
