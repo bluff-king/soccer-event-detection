@@ -14,7 +14,7 @@ def get_device() -> str:
 @torch.no_grad()
 def predict_probs(model, tok, samples: list[Sample], max_length: int, batch_size: int = 128,
                   device: str | None = None, fp16: bool = True, num_workers: int = 0,
-                  ids: list[list[int]] | None = None) -> np.ndarray:
+                  ids: list[list[int]] | None = None, amp_dtype: str = "fp16") -> np.ndarray:
     """Class probabilities per window. ``ids`` = output of ``pretokenize`` for ``samples`` (reused
     across repeated evaluations of the same set)."""
     device = device or get_device()
@@ -29,7 +29,7 @@ def predict_probs(model, tok, samples: list[Sample], max_length: int, batch_size
     out = []
     use_amp = fp16 and device == "cuda"
     for b in dl:
-        with torch.autocast("cuda", dtype=torch.float16, enabled=use_amp):
+        with torch.autocast("cuda", dtype=torch.bfloat16 if amp_dtype == "bf16" else torch.float16, enabled=use_amp):
             logits = model(input_ids=b["input_ids"].to(device), attention_mask=b["attention_mask"].to(device)).logits
         out.append(torch.softmax(logits.float(), -1).cpu().numpy())
     probs = np.concatenate(out) if out else np.zeros((0, model.config.num_labels), dtype=np.float32)

@@ -103,7 +103,10 @@ def train(cfg: dict) -> dict:
 
     sched = get_linear_schedule_with_warmup(opt, int(total * tr.get("warmup_ratio", 0.06)), total)
     use_amp = tr.get("fp16", True) and device == "cuda"
-    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
+    # bf16 (Ampere+) has the fp32 exponent range: no loss scaling needed, and no fp16 overflow (DeBERTa-v3)
+    bf16 = tr.get("amp_dtype", "fp16") == "bf16"
+    amp_dtype = torch.bfloat16 if bf16 else torch.float16
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp and not bf16)
     eval_every = tr.get("eval_every") or steps_per_epoch
     select = tr.get("select_metric", "highlight_f1")
     best, history, step = -1.0, [], 0
@@ -120,7 +123,7 @@ def train(cfg: dict) -> dict:
         if device == "cuda":  # release cached training activations so small GPUs do not spill during eval
             torch.cuda.empty_cache()
         probs = predict_probs(model, tok, valid_samples, cfg["model"]["max_length"], tr["eval_batch_size"], device,
-                              tr.get("fp16", True), ids=valid_ids)
+                              tr.get("fp16", True), ids=valid_ids, amp_dtype=tr.get("amp_dtype", "fp16"))
         y = np.array([LABEL2ID[s.label] for s in valid_samples])
         m = segment_metrics(y, probs.argmax(1))
         val_loss = float(-np.log(np.clip(probs[np.arange(len(y)), y], 1e-8, 1.0)).mean())
@@ -158,7 +161,7 @@ def train(cfg: dict) -> dict:
     for epoch in range(tr["epochs"]):
         for i, b in enumerate(dl):
             b = {k: v.to(device) for k, v in b.items()}
-            with torch.autocast("cuda", dtype=torch.float16, enabled=use_amp):
+            with torch.autocast("cuda", dtype=amp_dtype, enabled=use_amp):
                 logits = model(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).logits
             loss = loss_fn(logits.float(), b["labels"]) / tr.get("grad_accum", 1)
             scaler.scale(loss).backward()

@@ -116,7 +116,7 @@ def evaluate_checkpoint(cfg: dict, model, tok, out_dir: str | Path, splits=("val
     probs = {}
     for s in splits:
         probs[s] = predict_probs(model, tok, samples[s], cfg["model"]["max_length"], tr["eval_batch_size"],
-                                 fp16=tr.get("fp16", True))
+                                 fp16=tr.get("fp16", True), amp_dtype=tr.get("amp_dtype", "fp16"))
         np.save(out_dir / f"probs_{s}.npy", probs[s])
     res = evaluate_probs(cfg, probs, samples, out_dir)
     (out_dir / "metrics.json").write_text(json.dumps(res, indent=1))
