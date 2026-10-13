@@ -19,9 +19,46 @@ from sed.data.align import mention_profile, mentions_any
 from sed.data.build import build_echoes, class_counts
 from sed.labels import CLASSES
 from sed.sources.caption import load_caption_samples
+from sed.sources.asr_views import load_asr_views
 from sed.sources.kaggle_events import kaggle_class_counts, overlapping_kaggle_games
+from sed.sources.livetext import load_livetext_samples, summarize as livetext_summary
 
 SPLITS = ("train", "valid", "test")
+# candidate labelling windows (s relative to the event) for the coverage table
+WINDOWS = [(-5, 15), (-15, 15), (-30, 10), (-60, 5), (-90, 10)]
+
+
+def window_coverage(games, split: str = "train") -> dict:
+    """Share of events with >= 1 segment mentioning the class keyword inside each candidate window: a window that
+    misses the commentary labels silent segments as the event (label noise)."""
+    rng = np.random.default_rng(0)
+    out = {}
+    for c in ("Goal", "Card", "Penalty"):
+        n, hit, chance = 0, Counter(), Counter()
+        for g in games:
+            if g.split != split:
+                continue
+            for e in g.events:
+                if e.cls != c or e.half not in g.halves:
+                    continue
+                n += 1
+                segs = g.halves[e.half]
+                times = [x.start for x in segs if c in mentions_any(x.text)]
+                # chance level: the same window at a random time >= 5 min away from every event of the class
+                busy = [f.time for f in g.events if f.cls == c and f.half == e.half]
+                t_rand = None
+                for _ in range(50):
+                    t = rng.uniform(0, max(segs[-1].end, 1))
+                    if all(abs(t - b_) > 300 for b_ in busy):
+                        t_rand = t
+                        break
+                for w in WINDOWS:
+                    hit[w] += any(w[0] <= x - e.time <= w[1] for x in times)
+                    if t_rand is not None:
+                        chance[w] += any(w[0] <= x - t_rand <= w[1] for x in times)
+        out[c] = {"events": n, **{f"[{a},{b}]": round(hit[(a, b)] / max(n, 1), 3) for a, b in WINDOWS},
+                  **{f"chance[{a},{b}]": round(chance[(a, b)] / max(n, 1), 3) for a, b in WINDOWS}}
+    return out
 
 
 def md_table(header: list[str], rows: list[list]) -> str:
@@ -103,6 +140,13 @@ def main(argv=None):
                     "pct": dict(zip(["p10", "p25", "p50", "p75", "p90"],
                                     np.percentile(hit, [10, 25, 50, 75, 90]).round(1).tolist())) if len(hit) else {}}
     stats["first_mention_delay"] = first
+    stats["window_coverage_train"] = window_coverage(b.games)
+
+    # ---------------- other Whisper transcripts of the train games (real ASR) ----------------
+    views = load_asr_views(cfg, [g for g in b.games if g.split == "train"], "en")
+    stats["asr_views"] = {"total": class_counts(views),
+                          "per_variant": {v: class_counts([x for x in views if x.meta["variant"] == v])
+                                          for v in sorted({x.meta["variant"] for x in views})}}
 
     # ---------------- SoccerNet-Caption ----------------
     all_games = [g.game for g in b.games]
@@ -126,6 +170,14 @@ def main(argv=None):
                            "overlap_with_valid_test_games(removed)": len(ov_heldout)}
     else:
         stats["kaggle"] = None
+
+    # ---------------- live-text commentary (HF Football-Commentary) ----------------
+    lroot = Path(d["raw_root"]) / "hf_football_commentary"
+    if any(lroot.glob("*.parquet")):
+        lt = load_livetext_samples(lroot, cfg.get("seed", 42))
+        stats["livetext"] = {"counts": class_counts(lt), **livetext_summary(lt)}
+    else:
+        stats["livetext"] = None
 
     (out / "data_survey.json").write_text(json.dumps(stats, indent=1, ensure_ascii=False))
     make_figures(stats, out / "figures")
@@ -196,7 +248,16 @@ def write_md(stats: dict, cfg: dict, path: Path) -> None:
     L += [md_table(["class", "#events", "with keyword mention in [-30,+90] s", "first-mention delay p10/p25/p50/p75/p90 (s)"],
                    [[c, v["events"], v["with_mention"], " / ".join(str(x) for x in v["pct"].values())]
                     for c, v in stats["first_mention_delay"].items()])]
-    L += ["", "## 3. SoccerNet-Caption (mirror, labelled by alignment to Labels-v2)", ""]
+    L += ["", "### Which labelling window matches the commentary? (train games)", "",
+          "Share of events with at least one segment mentioning the class keyword inside the window. Segments of an "
+          "event whose window misses the commentary are labelled as the event although nothing in them says so.", ""]
+    wc = stats["window_coverage_train"]
+    L += [md_table(["class", "#events"] + [f"[{a},{b}] s" for a, b in WINDOWS],
+                   [[c, v["events"]] + [f"{100 * v[f'[{a},{b}]']:.0f}% (chance {100 * v[f'chance[{a},{b}]']:.0f}%)"
+                                        for a, b in WINDOWS] for c, v in wc.items()])]
+    L += ["", "Chance = the same window placed at a random time at least 5 min away from every event of the class. "
+          "The useful signal is the gap between the two numbers.", ""]
+    L += ["", "## 3. SoccerNet-Caption (labelled by Labels-caption.json, or alignment for the mirror)", ""]
     cap = stats["caption"]
     L += [md_table(["subset"] + CLASSES, [["all games"] + [cap["all_games"][c] for c in CLASSES],
                                          ["train games only (used)"] + [cap["train_games_only"][c] for c in CLASSES]])]
@@ -207,6 +268,18 @@ def write_md(stats: dict, cfg: dict, path: Path) -> None:
         L += [md_table(["games"] + CLASSES + ["overlap w/ SoccerNet", "overlap w/ valid+test (removed)"],
                        [[k["games"]] + [k["rows_per_class"][c] for c in CLASSES]
                         + [k["overlap_with_soccernet_games"], k["overlap_with_valid_test_games(removed)"]]])]
+    else:
+        L += ["not downloaded"]
+    L += ["", "## 4b. Other Whisper transcripts of the train games (`asr_views`, English text)", ""]
+    av = stats["asr_views"]
+    L += [md_table(["variant"] + CLASSES, [[v] + [c[k] for k in CLASSES] for v, c in av["per_variant"].items()]
+                   + [["**total**"] + [av["total"][k] for k in CLASSES]])]
+    L += ["", "## 4c. Live-text commentary (HF `falahmanalodi/Football-Commentary`, MIT, PL 2024-25)", ""]
+    lt = stats["livetext"]
+    if lt:
+        L += [md_table(["matches"] + CLASSES + ["penalty mentions labelled No-Event"],
+                       [[lt["matches"]] + [lt["counts"][k] for k in CLASSES] + [lt["penalty_mention_negatives"]]])]
+        L += ["", "Penalty lines by type: " + ", ".join(f"{k} {v}" for k, v in lt["penalty_by_type"].items())]
     else:
         L += ["not downloaded"]
     L += ["", "## 5. Natural hard negatives inside Echoes (No-Event windows mentioning a class keyword)", ""]
