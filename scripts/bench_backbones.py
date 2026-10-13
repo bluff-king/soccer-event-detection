@@ -37,12 +37,20 @@ CANDIDATES = {
 }
 
 
-def throughput(model, tok, samples, bs, freeze, amp, steps=30):
+def make_opt(params, lr, kind):
+    if kind == "adamw8bit":
+        import bitsandbytes as bnb
+
+        return bnb.optim.AdamW8bit(params, lr=lr, weight_decay=0.01)
+    return torch.optim.AdamW(params, lr=lr, weight_decay=0.01)
+
+
+def throughput(model, tok, samples, bs, freeze, amp, steps=30, optimizer="adamw"):
     model.train()
     emb = model.get_input_embeddings().weight
     emb.requires_grad_(not freeze)
     params = [p for p in model.parameters() if p.requires_grad]
-    opt = torch.optim.AdamW(params, lr=1e-5)
+    opt = make_opt(params, 1e-5, optimizer)
     dt = torch.bfloat16 if amp == "bf16" else torch.float16
     scaler = torch.amp.GradScaler("cuda", enabled=amp == "fp16")
     dl = torch.utils.data.DataLoader(WindowDataset(samples, tok, 128), batch_size=bs, shuffle=True,
@@ -78,13 +86,13 @@ def throughput(model, tok, samples, bs, freeze, amp, steps=30):
     return res
 
 
-def short_finetune(cfg, name, amp, train, valid, steps, bs, lr, freeze):
+def short_finetune(cfg, name, amp, train, valid, steps, bs, lr, freeze, optimizer="adamw"):
     set_seed(cfg.get("seed", 42))
     c = {**cfg, "model": {**cfg["model"], "name": name, "freeze_embeddings": freeze}}
     model, tok = build_model_and_tokenizer(c)
     model.cuda().train()
     params = [p for p in model.parameters() if p.requires_grad]
-    opt = torch.optim.AdamW(params, lr=lr, weight_decay=0.01)
+    opt = make_opt(params, lr, optimizer)
     from transformers import get_linear_schedule_with_warmup
 
     sched = get_linear_schedule_with_warmup(opt, int(0.06 * steps), steps)
@@ -136,6 +144,8 @@ def main(argv=None):
     ap.add_argument("--bs", type=int, default=32)
     ap.add_argument("--lr", type=float, default=2e-5)
     ap.add_argument("--valid_neg", type=int, default=8000)
+    ap.add_argument("--optimizer", default="adamw", choices=["adamw", "adamw8bit"])
+    ap.add_argument("--tag", default="", help="suffix of the result key, e.g. @adamw8bit")
     a = ap.parse_args(argv)
     cfg = load_config(a.config)
     rng = np.random.default_rng(0)
@@ -151,7 +161,7 @@ def main(argv=None):
     for name in a.models:
         amp = CANDIDATES.get(name, {}).get("amp_dtype", "fp16")
         print(f"===== {name} ({amp})", flush=True)
-        r: dict = {"amp_dtype": amp}
+        r: dict = {"amp_dtype": amp, "optimizer": a.optimizer}
         model, tok = build_model_and_tokenizer({**cfg, "model": {**cfg["model"], "name": name}})
         ids = pretokenize(tok, valid[:5000], 128)
         r["tokens_per_window_mean"] = round(float(np.mean([len(x) for x in ids])), 1)
@@ -159,8 +169,8 @@ def main(argv=None):
         r["params_m"] = round(sum(p.numel() for p in model.parameters()) / 1e6, 1)
         r["embedding_params_m"] = round(model.get_input_embeddings().weight.numel() / 1e6, 1)
         model.cuda()
-        r["train_frozen_emb"] = throughput(model, tok, train[:3000], a.bs, True, amp)
-        r["train_full"] = throughput(model, tok, train[:3000], a.bs, False, amp)
+        r["train_frozen_emb"] = throughput(model, tok, train[:3000], a.bs, True, amp, optimizer=a.optimizer)
+        r["train_full"] = throughput(model, tok, train[:3000], a.bs, False, amp, optimizer=a.optimizer)
         del model
         gc.collect()
         torch.cuda.empty_cache()
@@ -170,8 +180,8 @@ def main(argv=None):
         full_ok = not r["train_full"].get("oom") and r["train_full"]["peak_gb"] < vram and \
             r["train_full"]["samples_per_s"] >= 0.5 * r["train_frozen_emb"]["samples_per_s"]
         r["finetune_freeze_embeddings"] = not full_ok  # freeze only when full fine-tuning spills/ooms
-        r["finetune"] = short_finetune(cfg, name, amp, train, valid, a.steps, a.bs, a.lr, not full_ok)
-        results[name] = r
+        r["finetune"] = short_finetune(cfg, name, amp, train, valid, a.steps, a.bs, a.lr, not full_ok, a.optimizer)
+        results[name + a.tag] = r
         print(json.dumps(r), flush=True)
         out_p.parent.mkdir(parents=True, exist_ok=True)
         out_p.write_text(json.dumps(results, indent=1))

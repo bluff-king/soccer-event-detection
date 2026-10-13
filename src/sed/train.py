@@ -111,7 +111,14 @@ def train(cfg: dict) -> dict:
         {"params": [p for n, p in named if not any(k in n for k in no_decay)], "weight_decay": tr.get("weight_decay", 0.01)},
         {"params": [p for n, p in named if any(k in n for k in no_decay)], "weight_decay": 0.0},
     ]
-    opt = torch.optim.AdamW(params, lr=float(tr["lr"]))
+    if tr.get("optimizer", "adamw") == "adamw8bit":
+        # 8-bit AdamW states (2 bytes/param instead of 8): lets 150-185M backbones with large activations
+        # (ModernBERT, DeBERTa-v3) be fully fine-tuned on a 4 GB card. Needs `pip install bitsandbytes`.
+        import bitsandbytes as bnb
+
+        opt = bnb.optim.AdamW8bit(params, lr=float(tr["lr"]))
+    else:
+        opt = torch.optim.AdamW(params, lr=float(tr["lr"]))
     steps_per_epoch = math.ceil(len(dl) / tr.get("grad_accum", 1))
     total = steps_per_epoch * tr["epochs"]
     if tr.get("max_steps"):

@@ -27,6 +27,7 @@ dependencies = [
 serve = ["fastapi", "uvicorn[standard]", "pydantic>=2"]
 dev = ["pytest", "httpx"]
 track = ["wandb>=0.22"]
+lowmem = ["bitsandbytes>=0.45"]   # train.optimizer: adamw8bit (small GPUs)
 
 [tool.setuptools.packages.find]
 where = ["src"]
