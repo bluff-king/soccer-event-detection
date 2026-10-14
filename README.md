@@ -3,11 +3,11 @@
 Dự án này phát hiện **bàn thắng (Goal), thẻ phạt (Card), penalty (Penalty)** chỉ từ transcript ASR lời bình luận,
 không xử lý video. Đầu ra là danh sách sự kiện `{type, timestamp, confidence}` để tự động tạo highlight.
 
-> **Trạng thái:** pipeline đã đầy đủ và kiểm chứng trên CPU: dữ liệu, mở rộng dữ liệu, huấn luyện, đánh giá 2 mức,
-> chẩn đoán precision, pipeline 2 tầng, API và Docker. Các số liệu thật đã có gồm khảo sát dữ liệu, mốc keyword rule
-> và một model nhỏ train trên CPU (mục 5). **Chưa có** kết quả `xlm-roberta-base` và các cải tiến: các bước này cần
-> GPU và được chạy bằng `notebooks/train_colab.ipynb` (mục 7). Bảng kết quả trong mục 5 đang để trống và sẽ điền sau
-> khi chạy notebook.
+> **Trạng thái:** đã chạy hai vòng thí nghiệm thật. Vòng 1 trên Colab T4 (mục 5.2), vòng 2 trên GPU 4 GB local
+> với nhãn SoccerNet chính thức, nguồn dữ liệu thật mới và chọn checkpoint theo F1 mức sự kiện (mục 5.3).
+> **Tốt nhất hiện tại: evt F1 test 0.614** (`roberta-base` + cửa sổ độ trễ theo lớp + ASR views + hard negatives +
+> hậu xử lý chọn trên valid; Penalty F1 0.41), so với 0.498 tốt nhất của vòng 1 và 0.130 của keyword rule.
+> Ablation mất cân bằng lớp, các backbone còn lại và nhiều seed đang chạy (mục 5.3).
 
 ## Mục lục
 1. [Bài toán](#1-bài-toán)
@@ -52,8 +52,13 @@ số liệu thô ở `docs/data_survey.json`).
 | **Kaggle Football Events** (9,074 trận, 2011-2017) | [kaggle secareanualin/football-events](https://www.kaggle.com/datasets/secareanualin/football-events); mirror [DakshS07/xG_Football](https://github.com/DakshS07/xG_Football) @c477b07 | trang Kaggle không ghi license rõ ràng → chỉ dùng cho nghiên cứu | mirror ✅ (Kaggle API ❌ ở cloud) | chỉ train | 872,694 (gốc) | 24,446 | 41,163 | 2,706 |
 | **Dữ liệu tổng hợp** (paraphrase giọng bình luận viên + nhiễu ASR) | tự sinh (`sed.sources.synthetic`) | – | ✅ | chỉ train | – | 1,000 | 1,000 | 3,000 |
 | **Hard negatives** (7 nhóm sinh + câu khai thác từ Echoes) | tự sinh / khai thác | – | ✅ | chỉ train | 7,100 | – | – | – |
-| MatchTime (căn chỉnh lại timestamp của SoccerNet-Caption) | [jyrao/MatchTime](https://github.com/jyrao/MatchTime), dữ liệu trên Google Drive | xem repo | ❌ (Drive bị chặn) | – | – | – | – | – |
-| SoccerReplay-1988 | Hugging Face (gated) | xem trang dataset | ❌ (HF bị chặn) | – | – | – | – | – |
+| **SoccerNet Labels-v2 / Labels-caption chính thức** (vòng 2) | gói `SoccerNet` (Hugging Face, không cần đăng nhập) | SoccerNet | ✅ local | nhãn + caption | – | Goal 1,517 · Card 1,928 · Penalty 155 sự kiện (466 trận) | | |
+| **Các bản Whisper khác của trận train** (`asr_views`, vòng 2) | cùng repo sn-echoes (v1/v2/v3 + bản dịch v1/v2) | như Echoes | ✅ | chỉ train | 523,819 | 7,300 | 9,787 | 683 (683 → 2,079 với cửa sổ theo lớp) |
+| **Live-text thật** (vòng 2) | [falahmanalodi/Football-Commentary](https://huggingface.co/datasets/falahmanalodi/Football-Commentary), 189 trận PL 2024-25 | MIT | ✅ | chỉ train (không trùng trận nào với SoccerNet 2014-2020) | 15,645 (906 câu nhắc "penalty" không phải sự kiện) | 1,392 | 1,243 | 127 |
+| MatchTime (căn chỉnh lại timestamp của SoccerNet-Caption) | [Homie0609/MatchTime](https://huggingface.co/datasets/Homie0609/MatchTime) | xem repo | ✅ | – (cùng câu chữ với SoccerNet-Caption, chỉ khác timestamp; ta đã gán nhãn theo `label` chính thức nên không cần) | – | – | – | – |
+| SoccerReplay-1988 (1,988 trận, 24 loại sự kiện có Penalty) | [Homie0609/SoccerReplay-1988](https://huggingface.co/datasets/Homie0609/SoccerReplay-1988) | CC-BY-NC-SA-4.0 | ❌ phải nộp NDA, duyệt 2–3 tuần | – | – | – | – | – |
+| Guardian minute-by-minute (live blog) | Guardian Open Platform API | điều khoản Guardian | ❌ key `test` hết hiệu lực, cần key riêng | – | – | – | – | – |
+| yallashoot/football-commentary-dataset | Hugging Face | CC-BY-4.0 | ✅ nhưng chỉ **15 dòng mẫu** | loại | – | – | – | – |
 
 Ghi chú:
 - Có 434 trận vừa có transcript vừa có nhãn (train 261 / valid 82 / test 91). Đã bỏ 66 trận không có trong mirror và
@@ -223,9 +228,11 @@ Nhận xét:
   hơn `data_hardneg`: các nguồn không cộng dồn.
 - **Làm mượt + NMS 45 s** cho +0.021 / +0.011 mà không tốn chi phí train nào.
 - **CE có trọng số** đổi precision lấy recall (R 0.647, P 0.330), F1 không tăng.
-- **`imp_class_delays` chưa kết luận được.** Penalty F1 = 0 vì early stopping (patience 1) giữ checkpoint epoch 0,
-  khi model chưa kịp học lớp hiếm này; thêm vào đó chỉ số chọn checkpoint (`highlight_f1` mức đoạn) bị chi phối bởi
-  Goal/Card. Cần chạy lại không early stop (hoặc chọn checkpoint theo F1 mức sự kiện) trước khi đưa vào final.
+- **Số của `imp_class_delays` trên Colab không hợp lệ (lỗi đã sửa).** Cửa sổ độ trễ được áp lúc *prepare*, nhưng
+  config này dùng chung `data/processed` với baseline: model train trên nhãn [-5, 15] cũ, còn lúc suy luận thời điểm
+  Penalty lại bị trừ độ trễ kỳ vọng mới (−27.5 s thay vì +5 s), nên mọi dự đoán Penalty lệch ~32 s, vượt ngưỡng
+  ±30 s → Penalty F1 = 0. Nay mỗi `processed_dir` ghi lại thiết lập gán nhãn và báo lỗi khi config không khớp. Chạy
+  lại đúng cách (mục 5.3), cửa sổ theo lớp là cải tiến lớn nhất cho Penalty.
 - **Hai tầng** (0.484 / 0.481) có lợi so với baseline nhưng không hơn model đơn `data_hardneg`: verifier loại mất
   quá nhiều sự kiện đúng (recall stage 1 0.885 còn 0.513).
 - **Gộp các nguồn tốt không cộng dồn.** `final` (hardneg + caption + synthetic + làm mượt) đạt 0.502 / 0.468, thấp
@@ -234,6 +241,90 @@ Nhận xét:
   → **Model chọn theo valid là `data_hardneg`** (cũng tốt nhất trên test). Notebook (mục 11) tự chọn run có evt F1
   trên valid cao nhất làm model cho API.
 - **Penalty vẫn là điểm yếu chính** (F1 ≤ 0.27): chỉ 506 đoạn train thật, và bình luận diễn ra trước nhãn ~1 phút.
+
+### 5.3 Vòng 2: chạy local trên RTX 3050 4 GB (nhãn chính thức, chọn checkpoint theo F1 mức sự kiện)
+
+Mọi run trong mục này dùng chung một recipe (`configs/local/`), log lên W&B group `local-v2`, và **chỉ so với nhau**
+(không so trực tiếp với bảng 5.2 vì nhãn và cách chọn checkpoint khác):
+
+- **Nhãn Labels-v2 chính thức** (gói `SoccerNet`, tải được không cần đăng nhập): 466 trận có transcript
+  (train 283 / valid 90 / test 93) thay vì 434 trận của bản mirror. Thời điểm Goal của hai bản trùng nhau trong 1 s
+  (1,430 bàn thắng), nên khác biệt chỉ là số trận.
+- **Chọn checkpoint theo F1 mức sự kiện** trên 45 trận valid nguyên vẹn (tune ngưỡng, NMS, ghép ±30 s), đánh giá
+  mỗi 500 bước, dừng sớm sau 4 lần không cải thiện. Chọn theo F1 mức đoạn trên tập con xáo trộn (như vòng 1) đã chọn
+  một checkpoint muộn, quá tự tin: evt F1 chỉ 0.389 với 692 FP Goal, phần lớn là bình luận sau bàn thắng.
+- `xlm-roberta-base` phải **đóng băng word embedding** (192M/278M tham số) mới vừa 4 GB; batch 32, lr 2e-5, fp16.
+- Valid được dùng để chọn checkpoint và ngưỡng nên số valid hơi lạc quan; **số test là số sạch**.
+
+**Ablation dữ liệu** (mỗi dòng thêm một thay đổi vào dòng trên; xlm-roberta-base):
+
+| Run | Thay đổi | evt F1 valid | Pen valid | **evt F1 test** | test P / R | test F1 Goal / Card / **Pen** | phút |
+|---|---|---|---|---|---|---|---|
+| `v2_baseline` | Echoes, cửa sổ chung [-5, 15] s | 0.522 | 0.143 | 0.497 | 0.53 / 0.47 | 0.46 / 0.57 / **0.12** | 34 |
+| `v2_delays` | + cửa sổ theo lớp Goal [-5,15] / Card [-15,15] / Penalty [-60,5] | 0.541 | 0.324 | **0.557** | 0.56 / 0.56 | 0.54 / 0.60 / **0.26** | 47 |
+| `v2_delays_views` | + các bản Whisper khác của trận train (ASR thật) | 0.579 | **0.415** | 0.544 | 0.57 / 0.52 | 0.46 / 0.63 / **0.36** | 27 |
+| `v2_delays_views_hardneg` | + hard negatives | 0.596 | 0.324 | **0.576** | **0.64** / 0.52 | 0.53 / 0.64 / 0.25 | 42 |
+| `..._caption` | + SoccerNet-Caption chính thức | 0.590 | 0.354 | 0.575 | 0.60 / 0.56 | 0.56 / 0.63 / 0.32 | 38 |
+| `..._caption_livetext` | + live-text thật (HF, PL 2024-25) | 0.598 | 0.357 | 0.564 | 0.64 / 0.50 | 0.52 / 0.63 / 0.31 | 83 |
+
+- **Sửa cửa sổ gán nhãn là cải tiến lớn nhất cho Penalty**: F1 Penalty test gấp đôi (0.12 → 0.26), evt F1 test
+  +0.06. Đúng như phân tích ở `docs/survey_v2/DATA_SURVEY.md`: với [-5, 15] s chỉ 37 % sự kiện Penalty có câu nhắc
+  "penalty" trong cửa sổ (mức ngẫu nhiên 6 %), với [-60, 5] s là 87 % (ngẫu nhiên 13 %).
+- **ASR views** (mỗi hiệp có tới 5 bản Whisper; trước đây chỉ dùng 1) cho Penalty cao nhất và cắt nửa nhóm FP
+  "other" (câu ngẫu nhiên bị gán nhầm là sự kiện), nhưng Goal test giảm nên tổng không tăng.
+- **Hard negatives** giảm đúng loại lỗi nhắm tới (bảng dưới) và cho precision cao nhất.
+- Ba dòng cuối chênh nhau ≤ 0.012: nhỏ hơn nhiễu do seed, chưa kết luận được caption/live-text có giúp hay không
+  (đang chạy thêm seed 1, 2 cho cả ba).
+
+Số FP mức sự kiện trên test theo nhóm (`sed.diagnose`):
+
+| Run | replay / nhắc lại | có từ khoá, không có sự kiện | lệch thời gian | nhầm lớp | other | **Tổng FP** | **TP** |
+|---|---|---|---|---|---|---|---|
+| `v2_baseline` | 112 | 42 | 69 | 22 | 52 | 307 | 349 |
+| + cửa sổ theo lớp | 137 | 59 | 69 | 11 | 48 | 327 | **415** |
+| + ASR views | 109 | 60 | 77 | 8 | **21** | 287 | 387 |
+| + hard negatives | **83** | **42** | 62 | 3 | 18 | **219** | 391 |
+| + caption + live-text | **72** | 40 | 66 | 5 | 21 | **211** | 377 |
+
+**Hậu xử lý** (`scripts/sweep_postprocess.py`, chỉ dùng xác suất đã lưu): làm mượt {1, 3, 5} × NMS {20, 30, 45, 60} s,
+ngưỡng tune lại trên valid cho mỗi cấu hình, cấu hình chọn trên valid:
+
+| Run | mặc định (1, 30 s): valid / test | chọn trên valid | valid / **test** | theo lớp (chọn trên valid): test |
+|---|---|---|---|---|
+| `..._hardneg` | 0.596 / 0.576 | làm mượt 3, NMS 60 | 0.620 / **0.589** | 0.600 |
+| `..._caption` | 0.590 / 0.575 | làm mượt 5, NMS 45 | 0.619 / **0.595** | 0.594 |
+| `..._livetext` | 0.598 / 0.564 | làm mượt 3, NMS 45 | 0.606 / 0.575 | 0.571 |
+| `bb_roberta` | 0.605 / 0.602 | làm mượt 5, NMS 60 | 0.626 / 0.602 | **0.614** |
+
+Penalty luôn chọn làm mượt 5 (bình luận về penalty kéo dài ~1 phút, Goal/Card ~20 s), nhưng chọn riêng theo lớp
+chỉ đổi test −0.004 đến +0.012 so với chọn chung: trong vùng nhiễu.
+
+**Backbone** (`scripts/bench_backbones.py`, đo thật trên máy này; khảo sát ở `docs/backbones/`):
+
+| Backbone | Tham số | Train trên 4 GB | Ghi chú đo được |
+|---|---|---|---|
+| `xlm-roberta-base` | 278M (192M embedding) | 136 mẫu/s, 3.5 GB **chỉ khi đóng băng embedding** | không đóng băng: 5.3 GB, tràn RAM, 9 mẫu/s |
+| `jhu-clsp/mmBERT-base` | 308M | 8 mẫu/s, 4.6 GB kể cả đóng băng | loại: quá chậm |
+| `FacebookAI/roberta-base` | 125M | 136–147 mẫu/s, 2.5–3.2 GB | fine-tune toàn bộ được |
+| `vinai/bertweet-base` | 135M | 133–141 mẫu/s, 2.9–3.3 GB | kém roberta ở fine-tune ngắn |
+| `microsoft/deberta-v3-base` | 184M | 13–24 mẫu/s, 4.9 GB kể cả AdamW 8-bit | loại: không vừa 4 GB, không hỗ trợ SDPA |
+| `answerdotai/ModernBERT-base` | 150M | 91 mẫu/s, 3.5 GB **với AdamW 8-bit** (AdamW thường: tràn) | |
+| `jhu-clsp/ettin-encoder-150m` | 150M | 92 mẫu/s, 3.5 GB với AdamW 8-bit | |
+
+Run đầy đủ trên dữ liệu `v2_delays_views_hardneg`:
+
+| Backbone | evt F1 valid | **evt F1 test** | test Goal / Card / Pen | phút |
+|---|---|---|---|---|
+| xlm-roberta-base (đóng băng embedding) | 0.596 | 0.576 | 0.53 / 0.64 / 0.25 | 42 |
+| **roberta-base** | 0.605 | **0.602** | 0.58 / 0.65 / **0.35** | 77 |
+| ModernBERT-base (AdamW 8-bit, bf16) | _đang chạy_ | | | |
+| Ettin-150m (AdamW 8-bit, bf16) | _đang chạy_ | | | |
+
+roberta-base hơn xlm-r +0.026 test: dữ liệu chủ yếu là tiếng Anh (bản dịch của Whisper) và roberta được fine-tune
+toàn bộ, trong khi xlm-r phải đóng băng embedding.
+
+**Mất cân bằng lớp** (trên `v2_delays_views_hardneg`): sampler 1/√tần suất, CE có trọng số, focal loss, tỉ lệ âm/dương
+2 và 8 (mặc định 4): _đang chạy_.
 
 ## 6. Chẩn đoán precision
 
@@ -312,7 +403,27 @@ số cuối (mức đoạn, mức sự kiện, từng lớp, nhóm FP, ngưỡng
 tên `colab_<run>_<model>_len<L>_ep<E>` và gom theo `group` của từng phiên. Các run đã train trước khi bật wandb được
 đẩy lên một lần bằng `scripts/wandb_backfill.py`. Nếu thiếu key hoặc wandb lỗi, quá trình train vẫn chạy bình thường.
 
-### 7.5 Service suy luận
+### 7.5 Vòng 2 trên GPU nhỏ (4 GB, Windows hoặc Linux)
+```bash
+pip install -e ".[serve,dev,track,lowmem]"                   # lowmem = bitsandbytes (AdamW 8-bit)
+cp .env.example .env                                          # WANDB_API_KEY, HF_HOME (tuỳ chọn)
+python -m sed.data.download --root data/raw --official        # + nhãn/caption SoccerNet chính thức, live-text HF
+python scripts/prepare_data.py data.processed_dir=data/processed_v2_cd data.label_source=official \
+       "data.delay_per_class={Goal: [-5, 15], Card: [-15, 15], Penalty: [-60, 5]}"
+python scripts/survey_data.py data.label_source=official --out docs/survey_v2
+python scripts/run_experiments.py configs/local/v2/v2_delays_views_hardneg.yaml configs/local/v2/bb_roberta.yaml
+python scripts/sweep_postprocess.py outputs/local/bb_roberta  # hậu xử lý chọn trên valid (CPU)
+python scripts/prune_checkpoints.py "outputs/local/*"         # chỉ giữ checkpoint của run tốt nhất (~1 GB/run)
+```
+Nhiều run liên tiếp: `bash scripts/gpu_queue.sh outputs/local/queue.txt`. Runner đọc từng dòng lệnh của file
+(có thể thêm dòng khi đang chạy), chỉ cho phép một runner, và **chờ tới khi không còn tiến trình nào khác dùng GPU**.
+Hai job cùng chạy trên card 4 GB đều tràn bộ nhớ và chậm hàng chục lần.
+
+Mỗi config ghi các thiết lập gán nhãn (cửa sổ độ trễ, ngữ cảnh, nguồn nhãn…) vào `processed_dir/manifest.json`;
+config nào khác thiết lập phải dùng `processed_dir` riêng, nếu không lúc train sẽ báo lỗi (tránh lỗi đã gặp với
+`imp_class_delays`). `scripts/reevaluate.py` chấm lại run đã xong từ xác suất đã lưu khi đổi code hậu xử lý.
+
+### 7.6 Service suy luận
 ```bash
 # local
 MODEL_DIR=outputs/baseline/best uvicorn sed.service.app:app --port 8000
@@ -391,14 +502,15 @@ Dữ liệu (`data/`), checkpoint và `outputs/` không được commit (xem `.g
 
 ## 10. Hạn chế và việc còn lại
 
-- **Chưa có kết quả GPU:** baseline xlm-roberta, ablation, cải tiến và 2 tầng phải chạy bằng notebook Colab.
-  Bảng 5.2 đang để trống.
 - Repo baseline gốc không tìm thấy, nên mốc 72.4 % / 0.67 không tái hiện được trên cùng tập đánh giá. Cột `bal_*`
   chỉ là phép so sánh gần đúng.
-- Labels-v2 lấy từ mirror (434/500 trận, độ phân giải 1 s, không có trường `visibility`). Trên Colab có thể dùng
-  `--official` để lấy bản chính thức; khi đó `label_source: auto` sẽ ưu tiên bản chính thức.
-- MatchTime và SoccerReplay-1988 không truy cập được từ môi trường cloud (Google Drive và HF bị chặn), nên chưa tích
-  hợp. Loader caption đã hỗ trợ định dạng `Labels-caption.json` chính thức.
+- Vòng 1 (mục 5.2) dùng Labels-v2 từ mirror (434 trận), vòng 2 dùng bản chính thức (466 trận): hai bảng không so
+  trực tiếp được. Dòng `imp_hardneg_smoothing` của vòng 1 cần xác suất `data_hardneg` trên Google Drive, chưa chạy.
+- SoccerReplay-1988 cần NDA (duyệt 2–3 tuần); Guardian live blog cần API key riêng. Hai nguồn này chưa tích hợp.
+- Penalty vẫn là lớp yếu nhất (F1 test 0.25–0.41): chỉ 86 sự kiện ở 283 trận train, và một nửa số sự kiện có ít
+  hoặc không có lời bình luận nhắc tới penalty trong cửa sổ.
+- Vòng 2 chạy trên GPU 4 GB nên không thử được backbone lớn (`xlm-roberta-large`, DeBERTa-v3); `xlm-roberta-base`
+  phải đóng băng embedding.
 - Dữ liệu tổng hợp trong repo được sinh bằng backend `template`. Bản LLM (`hf`/`anthropic`) đã cài đặt nhưng chưa
   chạy ở đây vì không có GPU/API key.
 - Trên CPU chỉ dùng được backbone `tiny-local`, vì HF Hub bị chặn trong môi trường cloud.
