@@ -25,6 +25,16 @@ while true; do
   [ "$line" = "STOP" ] && break
   case "$line" in \#*) continue ;; esac
   if grep -qxF "$i	$line" <(cut -f1,2 "$done_f"); then continue; fi
+  # wait until no other process uses the GPU (two jobs on a 4 GB card both spill and crawl); QUEUE_WAIT_GPU=0 skips
+  if [ "${QUEUE_WAIT_GPU:-1}" = "1" ] && command -v nvidia-smi >/dev/null; then
+    waited=0
+    while [ -n "$(nvidia-smi --query-compute-apps=pid --format=csv,noheader 2>/dev/null | tr -d '[:space:]')" ]; do
+      [ $waited = 0 ] && echo "[queue] $(date +%H:%M:%S) GPU busy ($(nvidia-smi --query-compute-apps=pid --format=csv,noheader | tr '
+' ' ')) - waiting before #$i"
+      waited=1; sleep 60
+    done
+    [ $waited = 1 ] && echo "[queue] $(date +%H:%M:%S) GPU free"
+  fi
   echo "[queue] $(date +%H:%M:%S) start #$i: $line"
   t0=$(date +%s)
   bash -c "$line"
