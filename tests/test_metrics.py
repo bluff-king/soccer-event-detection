@@ -68,3 +68,18 @@ def test_balanced_subset_and_losses():
     fl = FocalLoss(2.0)(logits, torch.tensor([0, 1]))
     ce = torch.nn.functional.cross_entropy(logits, torch.tensor([0, 1]))
     assert 0 < fl.item() < ce.item()
+
+
+def test_per_class_smoothing_and_nms():
+    # No-Event, Goal, Card, Penalty; a single Penalty spike and a single Goal spike
+    p = np.full((7, 4), [1.0, 0.0, 0.0, 0.0])
+    p[3] = [0.0, 0.0, 0.0, 1.0]
+    p[5] = [0.0, 1.0, 0.0, 0.0]
+    s = smooth_probs(p, {"Penalty": 3, "Goal": 1})
+    assert np.allclose(s[2:5, 3], 1 / 3) and s[5, 1] == 1.0  # Penalty spread over 3 segments, Goal untouched
+    assert np.array_equal(s[:, 0], p[:, 0])  # No-Event not smoothed with per-class windows
+    assert np.allclose(smooth_probs(p, 3)[2:5, 3], 1 / 3)  # a single int still smooths every class
+    d = [Detection("g", 1, "Goal", t, 0.9 - t / 1000) for t in (0, 40)] + \
+        [Detection("g", 1, "Penalty", t, 0.9 - t / 1000) for t in (0, 40)]
+    kept = nms_1d(d, {"Goal": 30.0, "Penalty": 60.0})
+    assert [x.cls for x in kept].count("Goal") == 2 and [x.cls for x in kept].count("Penalty") == 1

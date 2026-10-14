@@ -18,13 +18,31 @@ from .labels import CLASSES, EVENT_CLASSES, LABEL2ID, NO_EVENT
 from .metrics import Detection, event_metrics, GTEvent
 
 
-def smooth_probs(probs: np.ndarray, window: int) -> np.ndarray:
-    if window <= 1 or len(probs) == 0:
-        return probs
+def per_class(value, cls: str, default=None):
+    """``value`` is either one setting for every class or a dict {class: setting} (missing classes -> default,
+    or the largest value of the dict)."""
+    if isinstance(value, dict):
+        return value.get(cls, default if default is not None else max(value.values()))
+    return value
+
+
+def _smooth_column(x: np.ndarray, window: int) -> np.ndarray:
+    if window <= 1:
+        return x
     k = np.ones(window) / window
     pad = window // 2
-    padded = np.pad(probs, ((pad, window - 1 - pad), (0, 0)), mode="edge")
-    out = np.stack([np.convolve(padded[:, c], k, mode="valid") for c in range(probs.shape[1])], axis=1)
+    return np.convolve(np.pad(x, (pad, window - 1 - pad), mode="edge"), k, mode="valid")
+
+
+def smooth_probs(probs: np.ndarray, window) -> np.ndarray:
+    """Moving average over neighbouring segments. ``window``: int, or dict {class: int} (e.g. a wider window for
+    Penalty, whose commentary spans ~1 min, than for Goal/Card, ~20 s); No-Event is left unsmoothed then."""
+    if len(probs) == 0 or (not isinstance(window, dict) and window <= 1):
+        return probs
+    out = probs.astype(np.float64, copy=True)
+    for c, name in enumerate(CLASSES):
+        w = per_class(window, name, 1) if isinstance(window, dict) else window
+        out[:, c] = _smooth_column(probs[:, c], int(w))
     return out
 
 
@@ -45,25 +63,26 @@ def threshold_predict(probs: np.ndarray, thresholds: dict[str, float] | None) ->
     return pred
 
 
-def nms_1d(cands: list[Detection], window: float) -> list[Detection]:
+def nms_1d(cands: list[Detection], window) -> list[Detection]:
     """Greedy temporal NMS per (game, half, class): keep the most confident detection and suppress
-    others closer than ``window`` seconds."""
+    others closer than ``window`` seconds (float, or dict {class: float})."""
     groups: dict = defaultdict(list)
     for d in cands:
         groups[(d.game, d.half, d.cls)].append(d)
     out = []
-    for g in groups.values():
+    for (_, _, cls), g in groups.items():
+        w = per_class(window, cls)
         g.sort(key=lambda d: -d.confidence)
         kept: list[Detection] = []
         for d in g:
-            if all(abs(d.time - k.time) >= window for k in kept):
+            if all(abs(d.time - k.time) >= w for k in kept):
                 kept.append(d)
         out += kept
     return sorted(out, key=lambda d: (d.game, d.half, d.time))
 
 
 def detect_events(meta: list[dict], probs: np.ndarray, thresholds: dict[str, float] | None,
-                  smoothing: int = 1, nms_window: float = 30.0, offsets: dict[str, float] | None = None) -> list[Detection]:
+                  smoothing=1, nms_window=30.0, offsets: dict[str, float] | None = None) -> list[Detection]:
     """``meta``: one dict per row with game, half, start, seg_idx (rows of a half must be contiguous
     and time-ordered, as produced by the window builder)."""
     offsets = offsets or {}
