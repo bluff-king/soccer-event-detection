@@ -1,0 +1,6 @@
+# Imbalance: focal loss (gamma 2).
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/imb_focal
+run_name: imb_focal
+train:
+  loss: focal

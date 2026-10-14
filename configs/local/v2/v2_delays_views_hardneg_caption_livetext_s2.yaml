@@ -1,0 +1,5 @@
+# Seed variance: v2_delays_views_hardneg_caption_livetext with seed 2 (also changes negative subsampling and data order).
+_base_: v2_delays_views_hardneg_caption_livetext.yaml
+seed: 2
+output_dir: outputs/local/v2_delays_views_hardneg_caption_livetext_s2
+run_name: v2_delays_views_hardneg_caption_livetext_s2
