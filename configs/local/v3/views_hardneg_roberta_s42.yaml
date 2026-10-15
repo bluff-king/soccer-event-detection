@@ -1,0 +1,11 @@
+# v3 recipe (see README.md in this folder): views_hardneg_roberta, seed 42. Data = bb_roberta.yaml.
+_base_: ../v2/bb_roberta.yaml
+seed: 42
+output_dir: outputs/local/v3/views_hardneg_roberta_s42
+run_name: v3_views_hardneg_roberta_s42
+train:
+  epochs: 2
+  early_stop_patience: null
+  eval_every: 1000
+logging:
+  group: local-v3

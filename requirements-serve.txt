@@ -1,0 +1,8 @@
+transformers>=4.40
+tokenizers
+sentencepiece
+numpy
+pyyaml
+fastapi
+uvicorn[standard]
+pydantic>=2

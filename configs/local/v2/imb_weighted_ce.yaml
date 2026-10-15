@@ -1,0 +1,6 @@
+# Imbalance: cross-entropy with inverse-sqrt-frequency class weights.
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/imb_weighted_ce
+run_name: imb_weighted_ce
+train:
+  loss: weighted_ce

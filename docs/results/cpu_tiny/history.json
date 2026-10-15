@@ -1,0 +1,32 @@
+[
+ {
+  "step": 1005,
+  "tag": "epoch0",
+  "elapsed_s": 731.8,
+  "accuracy": 0.8004075860921643,
+  "macro_f1": 0.394601288847658,
+  "highlight_f1": 0.33733974358974356,
+  "highlight_precision": 0.3667247386759582,
+  "highlight_recall": 0.31231454005934717
+ },
+ {
+  "step": 2010,
+  "tag": "epoch1",
+  "elapsed_s": 907.0,
+  "accuracy": 0.7697554483447013,
+  "macro_f1": 0.38052915258865205,
+  "highlight_f1": 0.3208920187793427,
+  "highlight_precision": 0.3054066130473637,
+  "highlight_recall": 0.33803165182987144
+ },
+ {
+  "step": 3015,
+  "tag": "epoch2",
+  "elapsed_s": 1055.7,
+  "accuracy": 0.7579437697554483,
+  "macro_f1": 0.3644632330997147,
+  "highlight_f1": 0.2934479553903346,
+  "highlight_precision": 0.2767309377738826,
+  "highlight_recall": 0.31231454005934717
+ }
+]

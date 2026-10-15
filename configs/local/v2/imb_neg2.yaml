@@ -1,0 +1,8 @@
+# Imbalance: 2 negatives per positive (instead of 4) in Echoes train and ASR views (more balanced).
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/imb_neg2
+run_name: imb_neg2
+data:
+  train_neg_ratio: 2.0
+sources:
+  asr_views: {neg_ratio: 2.0}

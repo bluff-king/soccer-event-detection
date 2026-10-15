@@ -1,0 +1,7 @@
+# focal loss (gamma 2) + sqrt class weights
+_base_: ../base.yaml
+output_dir: outputs/imp_focal
+run_name: imp_focal
+train:
+  loss: focal_weighted
+  focal_gamma: 2.0

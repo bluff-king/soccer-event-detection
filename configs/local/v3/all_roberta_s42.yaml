@@ -1,0 +1,14 @@
+# v3 recipe (see README.md in this folder): all_roberta, seed 42. Data = v2_delays_views_hardneg_caption_livetext.yaml.
+_base_: ../v2/v2_delays_views_hardneg_caption_livetext.yaml
+seed: 42
+output_dir: outputs/local/v3/all_roberta_s42
+run_name: v3_all_roberta_s42
+train:
+  epochs: 2
+  early_stop_patience: null
+  eval_every: 1000
+logging:
+  group: local-v3
+model:
+  name: FacebookAI/roberta-base
+  freeze_embeddings: false

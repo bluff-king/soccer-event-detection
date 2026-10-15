@@ -1,0 +1,11 @@
+# v3 recipe (see README.md in this folder): delays_xlmr, seed 1. Data = v2_delays.yaml.
+_base_: ../v2/v2_delays.yaml
+seed: 1
+output_dir: outputs/local/v3/delays_xlmr_s1
+run_name: v3_delays_xlmr_s1
+train:
+  epochs: 2
+  early_stop_patience: null
+  eval_every: 1000
+logging:
+  group: local-v3

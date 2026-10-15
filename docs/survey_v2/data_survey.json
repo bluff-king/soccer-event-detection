@@ -1,0 +1,478 @@
+{
+ "echoes": {
+  "games": {
+   "train": 283,
+   "valid": 90,
+   "test": 93
+  },
+  "skipped": {
+   "no_transcript": 34,
+   "no_split(challenge)": 50
+  },
+  "label_duplicates_removed": 488,
+  "raw_events": {
+   "train": {
+    "Goal": 908,
+    "Yellow card": 1124,
+    "Red card": 33,
+    "Penalty": 86,
+    "Yellow->red card": 21
+   },
+   "valid": {
+    "Goal": 309,
+    "Yellow card": 330,
+    "Penalty": 32,
+    "Yellow->red card": 4,
+    "Red card": 9
+   },
+   "test": {
+    "Goal": 302,
+    "Yellow card": 388,
+    "Penalty": 37,
+    "Red card": 8,
+    "Yellow->red card": 13
+   }
+  },
+  "segment_windows": {
+   "train": {
+    "No-Event": 409002,
+    "Goal": 6015,
+    "Card": 10794,
+    "Penalty": 1715
+   },
+   "valid": {
+    "No-Event": 132315,
+    "Goal": 1974,
+    "Card": 3194,
+    "Penalty": 705
+   },
+   "test": {
+    "No-Event": 131219,
+    "Goal": 1923,
+    "Card": 3803,
+    "Penalty": 702
+   }
+  },
+  "languages_halves": {
+   "en": 272,
+   "es": 249,
+   "ru": 192,
+   "de": 119,
+   "fr": 88,
+   "tr": 4,
+   "it": 4,
+   "pl": 2
+  }
+ },
+ "label_noise_goal_vs_score": {
+  "games": 7,
+  "examples": [
+   [
+    "europe_uefa-champions-league/2014-2015/2015-02-18 - 22-45 Schalke 0 - 2 Real Madrid",
+    3,
+    2
+   ],
+   [
+    "europe_uefa-champions-league/2015-2016/2015-11-24 - 22-45 Barcelona 6 - 1 AS Roma",
+    6,
+    7
+   ],
+   [
+    "europe_uefa-champions-league/2016-2017/2017-04-18 - 21-45 Real Madrid 4 - 2 Bayern Munich",
+    3,
+    6
+   ],
+   [
+    "germany_bundesliga/2016-2017/2017-01-29 - 19-30 1. FSV Mainz 05 1 - 1 Dortmund",
+    1,
+    2
+   ],
+   [
+    "germany_bundesliga/2016-2017/2017-04-29 - 16-30 Dortmund 0 - 0 FC Koln",
+    1,
+    0
+   ],
+   [
+    "spain_laliga/2014-2015/2015-05-17 - 20-00 Espanyol 1 - 4 Real Madrid",
+    6,
+    5
+   ],
+   [
+    "spain_laliga/2016-2017/2017-05-14 - 21-00 Real Madrid 4 - 1 Sevilla",
+    6,
+    5
+   ]
+  ]
+ },
+ "echoes_keyword_negatives": {
+  "test/Card": 657,
+  "test/Goal": 12034,
+  "test/Penalty": 945,
+  "train/Card": 1789,
+  "train/Goal": 35340,
+  "train/Penalty": 2746,
+  "valid/Card": 591,
+  "valid/Goal": 11230,
+  "valid/Penalty": 854
+ },
+ "mention_profile": {
+  "lo": -150,
+  "hi": 150,
+  "bin": 5,
+  "counts": {
+   "Goal": [
+    224.0,
+    190.0,
+    202.0,
+    197.0,
+    198.0,
+    201.0,
+    190.0,
+    216.0,
+    205.0,
+    220.0,
+    204.0,
+    175.0,
+    175.0,
+    181.0,
+    172.0,
+    190.0,
+    180.0,
+    205.0,
+    185.0,
+    191.0,
+    199.0,
+    188.0,
+    169.0,
+    189.0,
+    214.0,
+    192.0,
+    190.0,
+    176.0,
+    201.0,
+    449.0,
+    659.0,
+    425.0,
+    456.0,
+    386.0,
+    370.0,
+    406.0,
+    408.0,
+    386.0,
+    392.0,
+    423.0,
+    371.0,
+    392.0,
+    357.0,
+    341.0,
+    359.0,
+    309.0,
+    322.0,
+    277.0,
+    284.0,
+    279.0,
+    246.0,
+    244.0,
+    238.0,
+    242.0,
+    239.0,
+    216.0,
+    222.0,
+    247.0,
+    212.0,
+    225.0
+   ],
+   "Card": [
+    25.0,
+    21.0,
+    18.0,
+    24.0,
+    20.0,
+    29.0,
+    22.0,
+    21.0,
+    30.0,
+    23.0,
+    20.0,
+    21.0,
+    21.0,
+    17.0,
+    26.0,
+    18.0,
+    31.0,
+    19.0,
+    19.0,
+    18.0,
+    18.0,
+    21.0,
+    16.0,
+    21.0,
+    33.0,
+    31.0,
+    43.0,
+    96.0,
+    227.0,
+    608.0,
+    497.0,
+    258.0,
+    257.0,
+    204.0,
+    170.0,
+    104.0,
+    95.0,
+    63.0,
+    70.0,
+    48.0,
+    38.0,
+    38.0,
+    32.0,
+    31.0,
+    31.0,
+    34.0,
+    34.0,
+    30.0,
+    30.0,
+    21.0,
+    27.0,
+    34.0,
+    18.0,
+    28.0,
+    23.0,
+    29.0,
+    25.0,
+    30.0,
+    20.0,
+    25.0
+   ],
+   "Penalty": [
+    3.0,
+    6.0,
+    7.0,
+    4.0,
+    1.0,
+    1.0,
+    2.0,
+    5.0,
+    1.0,
+    3.0,
+    7.0,
+    6.0,
+    10.0,
+    9.0,
+    13.0,
+    17.0,
+    37.0,
+    31.0,
+    41.0,
+    36.0,
+    36.0,
+    31.0,
+    28.0,
+    31.0,
+    42.0,
+    26.0,
+    21.0,
+    31.0,
+    27.0,
+    12.0,
+    15.0,
+    22.0,
+    21.0,
+    14.0,
+    22.0,
+    17.0,
+    28.0,
+    14.0,
+    9.0,
+    12.0,
+    12.0,
+    9.0,
+    11.0,
+    3.0,
+    5.0,
+    11.0,
+    8.0,
+    9.0,
+    8.0,
+    5.0,
+    6.0,
+    9.0,
+    2.0,
+    9.0,
+    9.0,
+    8.0,
+    5.0,
+    3.0,
+    4.0,
+    3.0
+   ]
+  }
+ },
+ "first_mention_delay": {
+  "Goal": {
+   "events": 1517,
+   "with_mention": 1450,
+   "pct": {
+    "p10": -29.6,
+    "p25": -22.3,
+    "p50": -2.8,
+    "p75": 5.5,
+    "p90": 27.5
+   }
+  },
+  "Card": {
+   "events": 1928,
+   "with_mention": 1506,
+   "pct": {
+    "p10": -11.5,
+    "p25": -5.0,
+    "p50": -0.8,
+    "p75": 3.7,
+    "p90": 16.0
+   }
+  },
+  "Penalty": {
+   "events": 155,
+   "with_mention": 128,
+   "pct": {
+    "p10": -32.1,
+    "p25": -28.1,
+    "p50": -21.8,
+    "p75": -8.2,
+    "p90": 24.5
+   }
+  }
+ },
+ "window_coverage_train": {
+  "Goal": {
+   "events": 906,
+   "[-5,15]": 0.694,
+   "[-15,15]": 0.734,
+   "[-30,10]": 0.744,
+   "[-60,5]": 0.798,
+   "[-90,10]": 0.892,
+   "chance[-5,15]": 0.333,
+   "chance[-15,15]": 0.449,
+   "chance[-30,10]": 0.504,
+   "chance[-60,5]": 0.703,
+   "chance[-90,10]": 0.79
+  },
+  "Card": {
+   "events": 1176,
+   "[-5,15]": 0.603,
+   "[-15,15]": 0.683,
+   "[-30,10]": 0.668,
+   "[-60,5]": 0.628,
+   "[-90,10]": 0.686,
+   "chance[-5,15]": 0.013,
+   "chance[-15,15]": 0.019,
+   "chance[-30,10]": 0.025,
+   "chance[-60,5]": 0.042,
+   "chance[-90,10]": 0.061
+  },
+  "Penalty": {
+   "events": 86,
+   "[-5,15]": 0.372,
+   "[-15,15]": 0.547,
+   "[-30,10]": 0.733,
+   "[-60,5]": 0.872,
+   "[-90,10]": 0.919,
+   "chance[-5,15]": 0.058,
+   "chance[-15,15]": 0.058,
+   "chance[-30,10]": 0.07,
+   "chance[-60,5]": 0.128,
+   "chance[-90,10]": 0.163
+  }
+ },
+ "asr_views": {
+  "total": {
+   "No-Event": 518293,
+   "Goal": 7506,
+   "Card": 13711,
+   "Penalty": 2079
+  },
+  "per_variant": {
+   "whisper_v1": {
+    "No-Event": 71777,
+    "Goal": 975,
+    "Card": 1773,
+    "Penalty": 274
+   },
+   "whisper_v1_en": {
+    "No-Event": 204857,
+    "Goal": 3364,
+    "Card": 5793,
+    "Penalty": 952
+   },
+   "whisper_v2": {
+    "No-Event": 83963,
+    "Goal": 1088,
+    "Card": 2192,
+    "Penalty": 328
+   },
+   "whisper_v2_en": {
+    "No-Event": 86281,
+    "Goal": 1166,
+    "Card": 1971,
+    "Penalty": 287
+   },
+   "whisper_v3": {
+    "No-Event": 71415,
+    "Goal": 913,
+    "Card": 1982,
+    "Penalty": 238
+   }
+  }
+ },
+ "caption": {
+  "all_games": {
+   "No-Event": 30688,
+   "Goal": 1322,
+   "Card": 1838,
+   "Penalty": 170
+  },
+  "train_games_only": {
+   "No-Event": 18230,
+   "Goal": 784,
+   "Card": 1128,
+   "Penalty": 94
+  },
+  "n_games_with_captions": 437,
+  "keyword_negatives_train": 6902
+ },
+ "kaggle": {
+  "games": 10112,
+  "rows_per_class": {
+   "Goal": 24446,
+   "Card": 41163,
+   "Penalty": 2706,
+   "No-Event": 872694
+  },
+  "overlap_with_soccernet_games": 229,
+  "overlap_with_valid_test_games(removed)": 96
+ },
+ "livetext": {
+  "counts": {
+   "No-Event": 15645,
+   "Goal": 1392,
+   "Card": 1243,
+   "Penalty": 127
+  },
+  "by_label": {
+   "No-Event": 15645,
+   "Goal": 1392,
+   "Penalty": 127,
+   "Card": 1243
+  },
+  "penalty_by_type": {
+   "comment": 8,
+   "PM": 7,
+   "penalty save": 9,
+   "highlight": 36,
+   "PSG": 52,
+   "var": 15
+  },
+  "penalty_mention_negatives": 906,
+  "matches": 189
+ }
+}

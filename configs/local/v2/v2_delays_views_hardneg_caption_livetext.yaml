@@ -1,0 +1,7 @@
+# + real live-text commentary (HF Football-Commentary, 189 PL 2024-25 matches): 1,392 Goal / 1,243 Card /
+# 127 Penalty lines + 906 lines that mention a penalty without one (real hard negatives). Negatives subsampled.
+_base_: v2_delays_views_hardneg_caption.yaml
+output_dir: outputs/local/v2_delays_views_hardneg_caption_livetext
+run_name: v2_delays_views_hardneg_caption_livetext
+sources:
+  livetext: {enabled: true, neg_ratio: 4.0}

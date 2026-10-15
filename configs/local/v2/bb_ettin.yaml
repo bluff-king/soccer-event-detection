@@ -1,0 +1,10 @@
+# Backbone: Ettin encoder 150M (2025, GLUE 88.9 vs ModernBERT 88.4). 8-bit AdamW, bf16.
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/bb_ettin
+run_name: bb_ettin
+model:
+  name: jhu-clsp/ettin-encoder-150m
+  freeze_embeddings: false
+train:
+  optimizer: adamw8bit
+  amp_dtype: bf16

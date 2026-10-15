@@ -1,0 +1,16 @@
+# final candidate, chosen from the Colab ablations (README 5.2):
+#  - hardneg (+0.083 evt F1), caption (+0.057), synthetic (+0.044): the three sources that helped alone
+#  - no Kaggle: off-domain text, 3-4x the Echoes data, lowers precision and doubles training time
+#  - smoothing 3 + NMS 45 s: +0.021 for free
+#  - global delay window and plain CE: imp_class_delays was inconclusive (early-stopped at epoch 0),
+#    weighted CE traded precision for recall without a better F1
+_base_: base.yaml
+output_dir: outputs/final
+run_name: final
+sources:
+  caption: {enabled: true}
+  synthetic: {enabled: true}
+  hardneg: {enabled: true}
+postprocess:
+  smoothing: 3
+  nms_window: 45.0
