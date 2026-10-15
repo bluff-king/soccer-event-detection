@@ -70,7 +70,8 @@ def train(cfg: dict) -> dict:
         from .data.prepare import load_events
 
         games = sorted({s.game for s in valid_samples})
-        rng = np.random.default_rng(cfg.get("seed", 42))
+        # fixed selection games across training seeds, so seed runs differ only in training
+        rng = np.random.default_rng(tr.get("select_seed", 42))
         keep_games = set(rng.choice(games, size=min(tr["select_games"], len(games)), replace=False).tolist())
         valid_samples = [s for s in valid_samples if s.game in keep_games]
         select_gts = [g for g in load_events(cfg, "valid") if g.game in keep_games]
