@@ -1,0 +1,21 @@
+# Local runs on a 4 GB laptop GPU (RTX 3050). Same recipe as configs/base.yaml except:
+#  - the 250k-token word embedding of xlm-roberta is frozen (otherwise AdamW states do not fit in 4 GB);
+#  - validation (selection subset) every 500 steps (~4x per epoch) instead of once per epoch, so checkpoint
+#    selection and the W&B val curves are finer; early stopping after 4 evaluations (= 1 epoch) without improvement;
+#  - eval batch 128: larger batches overflow the 4 GB card into shared memory and run ~10x slower;
+#  - W&B logging on (key from .env). Every local run is compared only with other local runs.
+_base_: ../base.yaml
+output_dir: outputs/local/baseline
+run_name: baseline
+model:
+  freeze_embeddings: true
+train:
+  num_workers: 0
+  eval_batch_size: 128
+  eval_every: 500
+  early_stop_patience: 4
+  log_every: 10
+logging:
+  wandb: true
+  name_prefix: local
+  group: local-4gb

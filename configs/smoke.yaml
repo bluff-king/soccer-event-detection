@@ -1,0 +1,25 @@
+# CPU smoke test of the whole pipeline: 3 games per split, tiny offline model, a few hundred steps.
+# Scores are meaningless; the point is that every stage runs end to end.
+_base_: base.yaml
+output_dir: outputs/smoke
+data:
+  processed_dir: data/processed_smoke
+  max_games: 3
+  train_neg_ratio: 3.0
+sources:
+  caption: {enabled: true}
+  kaggle: {enabled: true, max_per_class: 200, neg_per_pos: 1.0}
+  synthetic: {enabled: true, backend: template, targets: {Penalty: 150, Goal: 50, Card: 50}}
+  hardneg: {enabled: true, per_category: 20, mined_max: 200}
+model:
+  name: tiny-local
+  max_length: 96
+train:
+  epochs: 2
+  batch_size: 32
+  eval_batch_size: 256
+  lr: 1.0e-3
+  max_steps: 200
+  eval_every: 100
+  num_workers: 0
+  loss: weighted_ce

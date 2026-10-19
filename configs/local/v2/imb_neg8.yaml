@@ -1,0 +1,8 @@
+# Imbalance: 8 negatives per positive (closer to the natural distribution).
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/imb_neg8
+run_name: imb_neg8
+data:
+  train_neg_ratio: 8.0
+sources:
+  asr_views: {neg_ratio: 8.0}

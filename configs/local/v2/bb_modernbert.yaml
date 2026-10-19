@@ -1,0 +1,10 @@
+# Backbone: ModernBERT-base (150M, 2024). Needs 8-bit AdamW to fit 4 GB (3.5 GB; 4.3 GB with AdamW). bf16.
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/bb_modernbert
+run_name: bb_modernbert
+model:
+  name: answerdotai/ModernBERT-base
+  freeze_embeddings: false
+train:
+  optimizer: adamw8bit
+  amp_dtype: bf16

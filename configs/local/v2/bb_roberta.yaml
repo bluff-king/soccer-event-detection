@@ -1,0 +1,7 @@
+# Backbone: roberta-base (English, 125M; fits full fine-tuning on 4 GB). Data = v2_delays_views_hardneg.
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/bb_roberta
+run_name: bb_roberta
+model:
+  name: FacebookAI/roberta-base
+  freeze_embeddings: false

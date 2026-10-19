@@ -1,0 +1,6 @@
+# Echoes + SoccerNet-Caption
+_base_: ../base.yaml
+output_dir: outputs/data_caption
+run_name: data_caption
+sources:
+  caption: {enabled: true}

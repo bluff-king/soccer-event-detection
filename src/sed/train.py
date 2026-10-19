@@ -1,0 +1,274 @@
+"""Training loop (plain PyTorch, fp16 autocast on GPU, linear warmup/decay, per-epoch validation and
+best-checkpoint selection), followed by the full evaluation.
+
+    python -m sed.train --config configs/base.yaml [overrides...]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import time
+from collections import Counter
+from pathlib import Path
+
+import numpy as np
+import torch
+import yaml
+
+from .config import load_config, set_seed
+from .data.prepare import assemble_train, load_split
+from .evaluate import evaluate_checkpoint, summary_row
+from .labels import LABEL2ID
+from .metrics import segment_metrics
+from .model.encoding import Collator, LengthGroupedBatchSampler, WindowDataset, pretokenize
+from .model.factory import build_model_and_tokenizer, load_checkpoint
+from .model.losses import build_loss
+from .model.predict import get_device, predict_probs
+from .tracking import Tracker
+
+
+# coarser than the final grid (tuned once per evaluation during training), with the high tail
+SELECT_GRID = np.round(np.r_[np.arange(0.1, 0.91, 0.1), [0.95, 0.98, 0.99, 0.995]], 3)
+
+
+def make_sampler(cfg: dict, labels: list[str]):
+    kind = cfg["train"].get("sampler", "none")
+    if kind == "none":
+        return None
+    c = Counter(labels)
+    power = 1.0 if kind == "balanced" else 0.5  # "sqrt": milder re-balancing
+    w = [1.0 / c[x] ** power for x in labels]
+    return torch.utils.data.WeightedRandomSampler(w, num_samples=len(labels), replacement=True)
+
+
+def train(cfg: dict) -> dict:
+    from .reuse import try_reuse
+
+    reused = try_reuse(cfg)  # post-processing-only configs evaluate an existing run's predictions
+    if reused is not None:
+        return reused
+    set_seed(cfg.get("seed", 42))
+    tr = cfg["train"]
+    out = Path(cfg["output_dir"])
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "config.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False))
+    device = get_device()
+
+    train_samples = assemble_train(cfg)
+    valid_samples = load_split(cfg, "valid")
+    if not valid_samples or not any(s.source == "echoes" for s in train_samples):
+        raise RuntimeError(f"no Echoes train/valid data in {cfg['data']['processed_dir']} (cwd {Path.cwd()}); "
+                           "run scripts/prepare_data.py from the repository root first")
+    select_gts = None
+    if tr.get("select_games"):
+        # model selection on whole validation games (every window, natural distribution) scored with the full
+        # event pipeline (thresholds tuned on these games, smoothing, NMS, +-T matching): the segment-level F1 of a
+        # shuffled subset is a poor proxy for event-level F1 (a later, more confident checkpoint can win on segments
+        # and fire on post-goal chatter)
+        from .data.prepare import load_events
+
+        games = sorted({s.game for s in valid_samples})
+        # fixed selection games across training seeds, so seed runs differ only in training
+        rng = np.random.default_rng(tr.get("select_seed", 42))
+        keep_games = set(rng.choice(games, size=min(tr["select_games"], len(games)), replace=False).tolist())
+        valid_samples = [s for s in valid_samples if s.game in keep_games]
+        select_gts = [g for g in load_events(cfg, "valid") if g.game in keep_games]
+    elif tr.get("select_eval_negatives"):
+        # per-epoch model selection on all validation positives + a fixed random subset of negatives
+        # (the final evaluation always uses the full validation/test sets)
+        rng = np.random.default_rng(cfg.get("seed", 42))
+        neg = [i for i, s in enumerate(valid_samples) if s.label == "No-Event"]
+        keep = set(rng.choice(neg, size=min(tr["select_eval_negatives"], len(neg)), replace=False).tolist())
+        valid_samples = [s for i, s in enumerate(valid_samples) if s.label != "No-Event" or i in keep]
+    labels = [s.label for s in train_samples]
+    print(f"[data] train={len(train_samples)} {dict(Counter(labels))} "
+          f"sources={dict(Counter(s.source for s in train_samples))} valid={len(valid_samples)}", flush=True)
+
+    model, tok = build_model_and_tokenizer(
+        cfg, [" ".join([s.ctx_before, s.text, s.ctx_after]) for s in train_samples[:50000]])
+    model.to(device)
+    t_tok = time.time()
+    ds = WindowDataset(train_samples, tok, cfg["model"]["max_length"])
+    valid_ids = pretokenize(tok, valid_samples, cfg["model"]["max_length"])
+    print(f"[data] pre-tokenised {len(ds) + len(valid_ids)} windows in {time.time() - t_tok:.0f}s", flush=True)
+    sampler = make_sampler(cfg, labels)
+    g = torch.Generator()
+    g.manual_seed(cfg.get("seed", 42))
+    collate = Collator(tok.pad_token_id)
+    if tr.get("group_by_length") and sampler is None:
+        dl = torch.utils.data.DataLoader(
+            ds, batch_sampler=LengthGroupedBatchSampler([len(x) for x in ds.ids], tr["batch_size"], g),
+            collate_fn=collate, num_workers=tr.get("num_workers", 0))
+    else:
+        dl = torch.utils.data.DataLoader(ds, batch_size=tr["batch_size"], shuffle=sampler is None, sampler=sampler,
+                                         collate_fn=collate, num_workers=tr.get("num_workers", 0),
+                                         generator=g, drop_last=False)
+    loss_fn = build_loss(cfg, labels).to(device)
+    no_decay = ("bias", "LayerNorm.weight", "layer_norm", "norm.weight")
+    named = [(n, p) for n, p in model.named_parameters() if p.requires_grad]  # skips frozen embeddings
+    params = [
+        {"params": [p for n, p in named if not any(k in n for k in no_decay)], "weight_decay": tr.get("weight_decay", 0.01)},
+        {"params": [p for n, p in named if any(k in n for k in no_decay)], "weight_decay": 0.0},
+    ]
+    if tr.get("optimizer", "adamw") == "adamw8bit":
+        # 8-bit AdamW states (2 bytes/param instead of 8): lets 150-185M backbones with large activations
+        # (ModernBERT, DeBERTa-v3) be fully fine-tuned on a 4 GB card. Needs `pip install bitsandbytes`.
+        import bitsandbytes as bnb
+
+        opt = bnb.optim.AdamW8bit(params, lr=float(tr["lr"]))
+    else:
+        opt = torch.optim.AdamW(params, lr=float(tr["lr"]))
+    steps_per_epoch = math.ceil(len(dl) / tr.get("grad_accum", 1))
+    total = steps_per_epoch * tr["epochs"]
+    if tr.get("max_steps"):
+        total = min(total, tr["max_steps"])
+    from transformers import get_linear_schedule_with_warmup
+
+    sched = get_linear_schedule_with_warmup(opt, int(total * tr.get("warmup_ratio", 0.06)), total)
+    use_amp = tr.get("fp16", True) and device == "cuda"
+    # bf16 (Ampere+) has the fp32 exponent range: no loss scaling needed, and no fp16 overflow (DeBERTa-v3)
+    bf16 = tr.get("amp_dtype", "fp16") == "bf16"
+    amp_dtype = torch.bfloat16 if bf16 else torch.float16
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp and not bf16)
+    eval_every = tr.get("eval_every") or steps_per_epoch
+    select = tr.get("select_metric", "highlight_f1")
+    best, history, step = -1.0, [], 0
+    patience = tr.get("early_stop_patience")  # evaluations without improvement before stopping (null = off)
+    since_best = 0
+    log_every = tr.get("log_every", 10)
+    run_loss, run_n = 0.0, 0.0
+    tracker = Tracker(cfg)
+    tracker.summary({"n_train": len(train_samples), **{f"train_count/{k}": v for k, v in Counter(labels).items()}})
+    t0 = time.time()
+
+    def run_eval(tag: str):
+        nonlocal best, since_best
+        if device == "cuda":  # release cached training activations so small GPUs do not spill during eval
+            torch.cuda.empty_cache()
+        probs = predict_probs(model, tok, valid_samples, cfg["model"]["max_length"], tr["eval_batch_size"], device,
+                              tr.get("fp16", True), ids=valid_ids, amp_dtype=tr.get("amp_dtype", "fp16"))
+        y = np.array([LABEL2ID[s.label] for s in valid_samples])
+        m = segment_metrics(y, probs.argmax(1))
+        val_loss = float(-np.log(np.clip(probs[np.arange(len(y)), y], 1e-8, 1.0)).mean())
+        evt = {}
+        if select_gts is not None:
+            from .data.prepare import class_offsets
+            from .evaluate import _meta
+            from .metrics import event_metrics
+            from .postprocess import detect_events, tune_thresholds
+
+            pp, tol = cfg["postprocess"], cfg["eval"]["tolerance"]
+            meta, offs = _meta(valid_samples), class_offsets(cfg)
+            thr = tune_thresholds(meta, probs, select_gts, tol, pp["smoothing"], pp["nms_window"], offs, SELECT_GRID)
+            em = event_metrics(detect_events(meta, probs, thr, pp["smoothing"], pp["nms_window"], offs), select_gts, tol)
+            evt = {"event_f1": em["overall"]["f1"], "event_precision": em["overall"]["precision"],
+                   "event_recall": em["overall"]["recall"],
+                   "event_macro_f1": float(np.mean([em[c]["f1"] for c in ("Goal", "Card", "Penalty")])),
+                   **{f"event_f1_{c}": em[c]["f1"] for c in ("Goal", "Card", "Penalty")}}
+            m.update(evt)
+        rec = {"step": step, "tag": tag, "epoch": round(step / steps_per_epoch, 3),
+               "elapsed_s": round(time.time() - t0, 1),
+               "train_samples_per_s": round(step * tr["batch_size"] * tr.get("grad_accum", 1)
+                                            / max(time.time() - t0, 1e-6), 1),
+               "gpu_peak_mem_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0,
+               "loss": round(val_loss, 5),
+               **{k: m[k] for k in ("accuracy", "macro_f1", "highlight_f1", "highlight_precision", "highlight_recall")},
+               **{f"f1_{c}": m["per_class"][c]["f1"] for c in m["per_class"]}, **evt}
+        history.append(rec)
+        log = {f"val/{k}": v for k, v in rec.items() if k not in ("step", "tag", "epoch", "elapsed_s",
+                                                                   "train_samples_per_s", "gpu_peak_mem_gb")}
+        if tracker.run is not None:  # confusion matrix per evaluation (wandb shows a step slider)
+            from .evaluate import _plot_cm
+
+            cm_path = out / "val_cm" / f"step{step:06d}.png"
+            cm_path.parent.mkdir(exist_ok=True)
+            _plot_cm(m["confusion_matrix"], cm_path, f"valid (selection set), step {step}")
+            log["val/confusion"] = tracker.image(cm_path)
+        tracker.log(log, step=step)
+        print(f"[eval] {json.dumps(rec)}", flush=True)
+        if m[select] > best:
+            since_best = 0
+            best = m[select]
+            model.save_pretrained(out / "best")
+            tok.save_pretrained(out / "best")
+        else:
+            since_best += 1
+        model.train()
+
+    model.train()
+    done = False
+    for epoch in range(tr["epochs"]):
+        for i, b in enumerate(dl):
+            b = {k: v.to(device) for k, v in b.items()}
+            with torch.autocast("cuda", dtype=amp_dtype, enabled=use_amp):
+                logits = model(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).logits
+            loss = loss_fn(logits.float(), b["labels"]) / tr.get("grad_accum", 1)
+            scaler.scale(loss).backward()
+            run_loss += loss.item()  # already divided by grad_accum -> run_loss / run_n = mean loss per sample batch
+            run_n += 1 / tr.get("grad_accum", 1)
+            if (i + 1) % tr.get("grad_accum", 1) == 0 or i + 1 == len(dl):
+                scaler.unscale_(opt)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                scaler.step(opt)
+                scaler.update()
+                opt.zero_grad(set_to_none=True)
+                sched.step()
+                step += 1
+                if step % log_every == 0:  # mean loss over the last log_every steps (a single batch is too noisy)
+                    avg = run_loss / max(run_n, 1)
+                    run_loss, run_n = 0.0, 0
+                    el = time.time() - t0
+                    tracker.log({"train/loss": avg, "train/lr": sched.get_last_lr()[0], "epoch": step / steps_per_epoch,
+                                 "train/samples_per_s": step * tr["batch_size"] * tr.get("grad_accum", 1) / max(el, 1e-6),
+                                 "train/gpu_mem_gb": torch.cuda.max_memory_allocated() / 2**30 if device == "cuda" else 0.0},
+                                step=step)
+                    if step % (log_every * 5) == 0:
+                        print(f"[train] epoch={epoch} step={step}/{total} loss={avg:.4f} "
+                              f"lr={sched.get_last_lr()[0]:.2e} {el:.0f}s", flush=True)
+                if step % eval_every == 0:
+                    run_eval(f"epoch{epoch}")
+                    if patience and since_best >= patience:
+                        print(f"[train] early stop: no {select} improvement in {patience} evaluation(s)", flush=True)
+                        done = True
+                        break
+                if step >= total:
+                    done = True
+                    break
+        if done:
+            break
+    if not history or history[-1]["step"] != step:
+        run_eval("final")
+    train_time = time.time() - t0
+    (out / "history.json").write_text(json.dumps(history, indent=1))
+
+    model, tok = load_checkpoint(out / "best", device)
+    res = evaluate_checkpoint(cfg, model, tok, out, ckpt_dir=out / "best")
+    res["train_time_s"] = train_time
+    res["n_train"] = len(train_samples)
+    res["train_class_counts"] = dict(Counter(labels))
+    res["train_source_counts"] = dict(Counter(s.source for s in train_samples))
+    (out / "metrics.json").write_text(json.dumps(res, indent=1))
+    row = summary_row(cfg.get("run_name", out.name), res, "valid")
+    row.update({f"test_{k}": v for k, v in summary_row("", res, "test").items() if k != "run"})
+    row["train_time_min"] = round(train_time / 60, 1)
+    (out / "summary.json").write_text(json.dumps(row, indent=1))
+    print("[summary]", json.dumps(row), flush=True)
+    tracker.log_results(res, out, row)
+    if tracker.run is not None:
+        (out / ".wandb_synced").write_text(tracker.run.url or "")
+    tracker.finish()
+    return res
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--config", default="configs/base.yaml")
+    ap.add_argument("overrides", nargs="*")
+    args = ap.parse_args(argv)
+    train(load_config(args.config, args.overrides))
+
+
+if __name__ == "__main__":
+    main()

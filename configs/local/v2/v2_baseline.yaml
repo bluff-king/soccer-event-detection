@@ -1,0 +1,4 @@
+# Echoes only, one delay window [-5, 15] s for every class (the reference recipe).
+_base_: base_v2.yaml
+output_dir: outputs/local/v2_baseline
+run_name: v2_baseline

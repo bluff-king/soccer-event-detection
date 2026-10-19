@@ -1,0 +1,6 @@
+# + hard negatives (replay / past reference / near miss / should-be / ... + mined Echoes windows).
+_base_: v2_delays_views.yaml
+output_dir: outputs/local/v2_delays_views_hardneg
+run_name: v2_delays_views_hardneg
+sources:
+  hardneg: {enabled: true}

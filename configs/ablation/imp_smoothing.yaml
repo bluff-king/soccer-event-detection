@@ -1,0 +1,10 @@
+# post-processing: probability smoothing (3 segments) + 45 s NMS
+# Same model as the baseline, so the baseline's saved predictions are re-evaluated instead of training
+# again (falls back to training if outputs/baseline is missing or not equivalent).
+_base_: ../base.yaml
+output_dir: outputs/imp_smoothing
+run_name: imp_smoothing
+reuse_probs_from: outputs/baseline
+postprocess:
+  smoothing: 3
+  nms_window: 45.0

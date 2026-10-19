@@ -1,0 +1,9 @@
+# wider context: 2 + current + 2 segments
+_base_: ../base.yaml
+output_dir: outputs/imp_context5
+run_name: imp_context5
+data:
+  ctx_before: 2
+  ctx_after: 2
+model:
+  max_length: 192

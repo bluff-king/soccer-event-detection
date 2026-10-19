@@ -1,0 +1,185 @@
+{
+ "answerdotai/ModernBERT-base": {
+  "seq_len": 91,
+  "sdpa": {
+   "config_attn": "sdpa",
+   "fp32": {
+    "loss": 1.344,
+    "loss_finite": true,
+    "logits_absmax": 1.25,
+    "grads_finite": true,
+    "peak_gb": 3.61
+   },
+   "fp16": {
+    "loss": 1.3438,
+    "loss_finite": true,
+    "logits_absmax": 1.25,
+    "grads_finite": true,
+    "peak_gb": 2.5
+   },
+   "bf16": {
+    "loss": 1.3463,
+    "loss_finite": true,
+    "logits_absmax": 1.24,
+    "grads_finite": true,
+    "peak_gb": 2.5
+   }
+  },
+  "eager": {
+   "config_attn": "eager",
+   "fp32": {
+    "loss": 1.2029,
+    "loss_finite": true,
+    "logits_absmax": 0.9,
+    "grads_finite": true,
+    "peak_gb": 3.47
+   },
+   "fp16": {
+    "loss": 1.2023,
+    "loss_finite": true,
+    "logits_absmax": 0.9,
+    "grads_finite": true,
+    "peak_gb": 2.7
+   },
+   "bf16": {
+    "loss": 1.1984,
+    "loss_finite": true,
+    "logits_absmax": 0.89,
+    "grads_finite": true,
+    "peak_gb": 2.7
+   }
+  }
+ },
+ "jhu-clsp/ettin-encoder-150m": {
+  "seq_len": 91,
+  "sdpa": {
+   "config_attn": "sdpa",
+   "fp32": {
+    "loss": 1.7902,
+    "loss_finite": true,
+    "logits_absmax": 1.17,
+    "grads_finite": true,
+    "peak_gb": 3.61
+   },
+   "fp16": {
+    "loss": 1.7904,
+    "loss_finite": true,
+    "logits_absmax": 1.17,
+    "grads_finite": true,
+    "peak_gb": 2.54
+   },
+   "bf16": {
+    "loss": 1.7947,
+    "loss_finite": true,
+    "logits_absmax": 1.16,
+    "grads_finite": true,
+    "peak_gb": 2.54
+   }
+  },
+  "eager": {
+   "config_attn": "eager",
+   "fp32": {
+    "loss": 1.4071,
+    "loss_finite": true,
+    "logits_absmax": 0.81,
+    "grads_finite": true,
+    "peak_gb": 3.47
+   },
+   "fp16": {
+    "loss": 1.4066,
+    "loss_finite": true,
+    "logits_absmax": 0.81,
+    "grads_finite": true,
+    "peak_gb": 2.7
+   },
+   "bf16": {
+    "loss": 1.4138,
+    "loss_finite": true,
+    "logits_absmax": 0.8,
+    "grads_finite": true,
+    "peak_gb": 2.7
+   }
+  }
+ },
+ "microsoft/deberta-v3-base": {
+  "seq_len": 91,
+  "sdpa": {
+   "error": "ValueError: DebertaV2ForSequenceClassification does not support an attention implementation through torch.nn.functional.scaled_dot_p"
+  },
+  "eager": {
+   "config_attn": "eager",
+   "fp32": {
+    "loss": 1.3515,
+    "loss_finite": true,
+    "logits_absmax": 0.13,
+    "grads_finite": true,
+    "peak_gb": 2.72
+   },
+   "fp16": {
+    "loss": 1.3515,
+    "loss_finite": true,
+    "logits_absmax": 0.13,
+    "grads_finite": true,
+    "peak_gb": 3.17
+   },
+   "bf16": {
+    "loss": 1.3517,
+    "loss_finite": true,
+    "logits_absmax": 0.13,
+    "grads_finite": true,
+    "peak_gb": 3.4
+   }
+  }
+ },
+ "FacebookAI/roberta-base": {
+  "seq_len": 91,
+  "sdpa": {
+   "config_attn": "sdpa",
+   "fp32": {
+    "loss": 1.3659,
+    "loss_finite": true,
+    "logits_absmax": 0.19,
+    "grads_finite": true,
+    "peak_gb": 2.17
+   },
+   "fp16": {
+    "loss": 1.3658,
+    "loss_finite": true,
+    "logits_absmax": 0.19,
+    "grads_finite": true,
+    "peak_gb": 1.74
+   },
+   "bf16": {
+    "loss": 1.3667,
+    "loss_finite": true,
+    "logits_absmax": 0.19,
+    "grads_finite": true,
+    "peak_gb": 1.74
+   }
+  },
+  "eager": {
+   "config_attn": "eager",
+   "fp32": {
+    "loss": 1.4484,
+    "loss_finite": true,
+    "logits_absmax": 0.16,
+    "grads_finite": true,
+    "peak_gb": 2.29
+   },
+   "fp16": {
+    "loss": 1.4485,
+    "loss_finite": true,
+    "logits_absmax": 0.16,
+    "grads_finite": true,
+    "peak_gb": 1.95
+   },
+   "bf16": {
+    "loss": 1.448,
+    "loss_finite": true,
+    "logits_absmax": 0.15,
+    "grads_finite": true,
+    "peak_gb": 1.95
+   }
+  }
+ }
+}

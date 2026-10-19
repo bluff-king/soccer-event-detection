@@ -1,0 +1,6 @@
+# Imbalance: sampler with weights 1/sqrt(class frequency) (milder than fully balanced).
+_base_: v2_delays_views_hardneg.yaml
+output_dir: outputs/local/imb_sampler_sqrt
+run_name: imb_sampler_sqrt
+train:
+  sampler: sqrt

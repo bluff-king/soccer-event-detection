@@ -1,0 +1,1608 @@
+{
+ "thresholds": {
+  "Goal": 0.5,
+  "Card": 0.5,
+  "Penalty": 0.5
+ },
+ "offsets": {
+  "Goal": 5.0,
+  "Card": 5.0,
+  "Penalty": 5.0
+ },
+ "smoothing": 1,
+ "nms_window": 30.0,
+ "tolerance": 30.0,
+ "valid": {
+  "segment_argmax": {
+   "accuracy": 0.8784774481720639,
+   "macro_f1": 0.30574047539389976,
+   "highlight_precision": 0.055736921729437054,
+   "highlight_recall": 0.17309594460929772,
+   "highlight_f1": 0.0843221104619647,
+   "highlight_macro_f1": 0.09576542865614983,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.971546436324005,
+     "recall": 0.9023406782780371,
+     "f1": 0.9356656156071497,
+     "support": 119538
+    },
+    "Goal": {
+     "precision": 0.035260276514800036,
+     "recall": 0.21652421652421652,
+     "f1": 0.06064474944142994,
+     "support": 1755
+    },
+    "Card": {
+     "precision": 0.3455964325529543,
+     "recall": 0.14918190567853706,
+     "f1": 0.20840336134453782,
+     "support": 2078
+    },
+    "Penalty": {
+     "precision": 0.011299435028248588,
+     "recall": 0.04739336492890995,
+     "f1": 0.01824817518248175,
+     "support": 211
+    }
+   },
+   "confusion_matrix": [
+    [
+     107864,
+     10256,
+     585,
+     833
+    ],
+    [
+     1363,
+     380,
+     1,
+     11
+    ],
+    [
+     1633,
+     104,
+     310,
+     31
+    ],
+    [
+     163,
+     37,
+     1,
+     10
+    ]
+   ]
+  },
+  "segment_thresholded": {
+   "accuracy": 0.8784774481720639,
+   "macro_f1": 0.30574047539389976,
+   "highlight_precision": 0.055736921729437054,
+   "highlight_recall": 0.17309594460929772,
+   "highlight_f1": 0.0843221104619647,
+   "highlight_macro_f1": 0.09576542865614983,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.971546436324005,
+     "recall": 0.9023406782780371,
+     "f1": 0.9356656156071497,
+     "support": 119538
+    },
+    "Goal": {
+     "precision": 0.035260276514800036,
+     "recall": 0.21652421652421652,
+     "f1": 0.06064474944142994,
+     "support": 1755
+    },
+    "Card": {
+     "precision": 0.3455964325529543,
+     "recall": 0.14918190567853706,
+     "f1": 0.20840336134453782,
+     "support": 2078
+    },
+    "Penalty": {
+     "precision": 0.011299435028248588,
+     "recall": 0.04739336492890995,
+     "f1": 0.01824817518248175,
+     "support": 211
+    }
+   },
+   "confusion_matrix": [
+    [
+     107864,
+     10256,
+     585,
+     833
+    ],
+    [
+     1363,
+     380,
+     1,
+     11
+    ],
+    [
+     1633,
+     104,
+     310,
+     31
+    ],
+    [
+     163,
+     37,
+     1,
+     10
+    ]
+   ]
+  },
+  "segment_balanced_argmax": {
+   "accuracy": 0.5384520276953512,
+   "macro_f1": 0.3224098577627427,
+   "highlight_precision": 0.5494505494505495,
+   "highlight_recall": 0.17309594460929772,
+   "highlight_f1": 0.26325686348251226,
+   "highlight_macro_f1": 0.20546770253427407,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.5363956560023481,
+     "recall": 0.9038081107814046,
+     "f1": 0.6732363234481489,
+     "support": 4044
+    },
+    "Goal": {
+     "precision": 0.4413472706155633,
+     "recall": 0.21652421652421652,
+     "f1": 0.2905198776758409,
+     "support": 1755
+    },
+    "Card": {
+     "precision": 0.9309309309309309,
+     "recall": 0.14918190567853706,
+     "f1": 0.25715470759021153,
+     "support": 2078
+    },
+    "Penalty": {
+     "precision": 0.125,
+     "recall": 0.04739336492890995,
+     "f1": 0.06872852233676977,
+     "support": 211
+    }
+   },
+   "confusion_matrix": [
+    [
+     3655,
+     340,
+     21,
+     28
+    ],
+    [
+     1363,
+     380,
+     1,
+     11
+    ],
+    [
+     1633,
+     104,
+     310,
+     31
+    ],
+    [
+     163,
+     37,
+     1,
+     10
+    ]
+   ]
+  },
+  "event": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.045987376014427414,
+    "recall": 0.8762886597938144,
+    "f1": 0.0873886223440713,
+    "tp": 255,
+    "fp": 5290,
+    "fn": 36
+   },
+   "Card": {
+    "precision": 0.39408866995073893,
+    "recall": 0.7570977917981072,
+    "f1": 0.5183585313174945,
+    "tp": 240,
+    "fp": 369,
+    "fn": 77
+   },
+   "Penalty": {
+    "precision": 0.02361111111111111,
+    "recall": 0.5862068965517241,
+    "f1": 0.045393858477970624,
+    "tp": 17,
+    "fp": 703,
+    "fn": 12
+   },
+   "overall": {
+    "precision": 0.07448356124527204,
+    "recall": 0.8037676609105181,
+    "f1": 0.13633337771268808,
+    "tp": 512,
+    "fp": 6362,
+    "fn": 125
+   },
+   "macro_f1": 0.21704700404651214
+  },
+  "event_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.024311032754941078,
+    "recall": 0.9003436426116839,
+    "f1": 0.04734369353089989,
+    "tp": 262,
+    "fp": 10515,
+    "fn": 29
+   },
+   "Card": {
+    "precision": 0.27201783723522854,
+    "recall": 0.7697160883280757,
+    "f1": 0.40197693574958815,
+    "tp": 244,
+    "fp": 653,
+    "fn": 73
+   },
+   "Penalty": {
+    "precision": 0.022598870056497175,
+    "recall": 0.6896551724137931,
+    "f1": 0.0437636761487965,
+    "tp": 20,
+    "fp": 865,
+    "fn": 9
+   },
+   "overall": {
+    "precision": 0.04188231547097699,
+    "recall": 0.82574568288854,
+    "f1": 0.07972112761442862,
+    "tp": 526,
+    "fp": 12033,
+    "fn": 111
+   },
+   "macro_f1": 0.16436143514309484
+  },
+  "event_argmax_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.024311032754941078,
+    "recall": 0.9003436426116839,
+    "f1": 0.04734369353089989,
+    "tp": 262,
+    "fp": 10515,
+    "fn": 29
+   },
+   "Card": {
+    "precision": 0.27201783723522854,
+    "recall": 0.7697160883280757,
+    "f1": 0.40197693574958815,
+    "tp": 244,
+    "fp": 653,
+    "fn": 73
+   },
+   "Penalty": {
+    "precision": 0.022598870056497175,
+    "recall": 0.6896551724137931,
+    "f1": 0.0437636761487965,
+    "tp": 20,
+    "fp": 865,
+    "fn": 9
+   },
+   "overall": {
+    "precision": 0.04188231547097699,
+    "recall": 0.82574568288854,
+    "f1": 0.07972112761442862,
+    "tp": 526,
+    "fp": 12033,
+    "fn": 111
+   },
+   "macro_f1": 0.16436143514309484
+  },
+  "fp_diagnosis": {
+   "n_detections": 6874,
+   "n_false_positives": 6362,
+   "groups": {
+    "replay_recall": {
+     "count": 2854,
+     "share": 0.44860106884627476
+    },
+    "keyword_no_event": {
+     "count": 2577,
+     "share": 0.4050613014775228
+    },
+    "time_offset": {
+     "count": 586,
+     "share": 0.09210939955988683
+    },
+    "wrong_class": {
+     "count": 244,
+     "share": 0.0383527192706696
+    },
+    "duplicate": {
+     "count": 101,
+     "share": 0.015875510845646024
+    }
+   },
+   "examples": {
+    "keyword_no_event": [
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 24.3,
+      "cls": "Card",
+      "confidence": 0.9,
+      "text": "Let's see why he lost the ball and Trippier was about to steal it. Alexis S\u00e1nchez is there | Complaining to the referee not only about the foul but also about the yellow card. There is one thing | statistically, we have to comment on it, although logically not too many have occurred"
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 35.3,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "statistically, we have to comment on it, although logically not too many have occurred | games lately, but not Arsenal's last four league visits to this stadium | He has won, the last three ended with a draw, in fact in the League the last victory is from the year 70,"
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 197.6,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "He is performing quite well. We did it the other day against Liverpool, for example Arsenal's first minutes against Liverpool were impressive | of pressure without the ball but of course today is not going to be so easy because the rival is going to come out and wait for him logically. | Ball ahead "
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 245.2,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "At the moment dominated in these first five minutes by Wenger's team Aaron Ramsey trying to get out against Jones. | It must be said that Alexis has to participate a lot, Ramsey also and I am remembering the City game that VARLEY won 1-0 with that goal from Boyd. | I think City made a mistake that d"
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 329.3,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Another first touch, the only one who gives two touches in the play is Alexis, then it's true that he gets a rebound from the defender. | But this is Arsenal, this is Arsenal, they start to combine quickly, they are really an unstoppable team. | Well, in the first situation against VARLEY, this very"
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 361.6,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Trippier hit the long ball, Kostielny ended up controlling it there, directing that ball towards Beller\u00edn. | Beller\u00edn went long, Giroud deflected there but without being able to direct the ball towards a teammate. | Vox's jump, Inks' arrival, not Vars, it was Vars trying to come from behind."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 392.1,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "because I get the feeling that George Boit ends up hitting Per Mertesacker there. | But well the VARLEY probably without elaborating so much, but it also arrives at the moment with danger. | This is Vox's action."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 909.3,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "He almost lost to Cazorla. | Tripier's cross towards the penalty spot. | Mertesacker played."
+     }
+    ],
+    "replay_recall": [
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 92.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "against Tottenham on the last day. It is true that it was very irregular during the championship also in | his stadium but in the last two home games he has added four points and has not conceded | Not a single goal from Sindic's team. Hitton hits again although he does so directly outside."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 132.8,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Barley is a team that plays longer. Mertesacker left the ball behind for Kostielny. | Beller\u00edn has just scored one of the four goals the team scored in the last game against Liverpool. | They also scored in this duel against Ozil, Alexis and Olivier Giroud. Cazorla holds that ball by supporting hims"
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 440.7,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Giroud's shot went very high, minute 8 of the first half. | There is Vox with Dani Inks, who by the way has gone six consecutive days without scoring, it is his worst streak this season. | Six consecutive days without scoring a goal."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 471.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Giroud's shot went very high, minute 8 of the first half. | There's Arfiel, Trippier, who hasn't scored for six consecutive days. | Giroud's shot went very high, minute 8 of the first half."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 569.8,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "And clear the varle's rear again. | The Varle is trying to mount a counterattack now, but Inks stopped. | Arsenal is not putting the same pressure they did against Libertadores."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 756.8,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It is true that with some counter-attacking action, Bar\u00e7a had also made itself visible in the last few meters. | There is still a lot of game left but it is certainly not the best start for the local team. | And on the other hand, it will give Arsenal even more confidence."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 883.3,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Not from the English front row. | But interesting teams like Millwall and Watford with a lot of history. | Jones' opening for Mee."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 917.3,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It's a mistake that Coquel\u00e1n gives away. | He makes that face of disbelief, but for me it's a mistake. | Give a divided ball, a ball that flies."
+     }
+    ],
+    "duplicate": [
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 691.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It's a ball that Coquel\u00e1n recovers and cuts well. | But the truth is, the pass that Alexis gives him is a very strong ball, difficult to control. | The Chilean controls it well and from there the 0-1 play is put together."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 931.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "He can have the space... | but he don't always use it properly. | He's in..."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 742.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It\u2019s not in play. | And with lucidity we knew that she could score other goals in this Esther defense | which doesn't always line up very well, the proof."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 2116.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It\u2019s Alexis Sanchez who scores a hat-trick. | He hadn\u2019t scored all season. | He woke up."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 2610.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "In any case, to believe. | That they can score a goal or two. | To Arsenal."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-12-26 - 18-00 Chelsea 2 - 2 Watford",
+      "half": 1,
+      "time": 2504.8,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "But Dini equalises. | Give away from Matic for the penalty. | And the Hornets are back in the game."
+     },
+     {
+      "game": "england_epl/2015-2016/2016-01-23 - 20-30 West Ham 2 - 2 Manchester City",
+      "half": 1,
+      "time": 536.0,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "would have been surprised if he'd missed, just allowed the keeper to move | and then rolled it into the other corner, brilliant penalty. | Great response, not only from City as a team but Aguero as an individual,"
+     },
+     {
+      "game": "england_epl/2015-2016/2016-01-23 - 20-30 West Ham 2 - 2 Manchester City",
+      "half": 2,
+      "time": 653.1,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "let it bounce once you do you're in major trouble Valencia does well just to hold off the second half of the game. | centre-half and took it away but a soft soft goal for City to concede | as a centre forward you've got to make your runs be optimistic hope the ball gets to you normally"
+     }
+    ],
+    "wrong_class": [
+     {
+      "game": "england_epl/2014-2015/2015-04-11 - 19-30 Burnley 0 - 1 Arsenal",
+      "half": 1,
+      "time": 1523.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It was very close to directing that ball. | Between the three sticks, Arsenal came close to scoring their second goal in the match. | It comes out touching the right post."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 1,
+      "time": 2466.2,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Little tug back. | Scoring the Dutch. | Air D.C. last season."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 2125.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Gives way to another of the summer signings. | Portuguese international, but not until after he's kept his goal again run going. | Rafa Timbi Gomes."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 742.0,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "Oh my God, what a beautiful counter. | What a great counter with a ball that was in Lester\u2019s penalty area. | This ball, we thought it was going to go out for a corner, not at all."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 1371.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "For a quarter of an hour we don\u2019t see him. | And behind him he is involved in the second goal. | He\u2019s a passer on the third."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 1409.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "I didn\u2019t say anything at the time. | But when you see him again\u2026 | Ah it\u2019s okay, it\u2019ll fall on me now."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 1562.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Indeed, Ramsey is better. | But it\u2019s easier for them. | Physically, they really lowered the Leicester players."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Manchester United 3 - 0 Sunderland",
+      "half": 1,
+      "time": 2238.5,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "And Lentz, what has he done here? | Across the face of his own goal and that's handball by Adam Johnson. | Goodness me. One error after another."
+     }
+    ],
+    "time_offset": [
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 225.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "And put it wide. | This time he was so close, he was prepared to take what was coming his way to score the goal. | To make it Swansea City 0-0, Manchester United 1."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 839.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Mata... | invigorated by the goal. | Schneidling."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-30 - 18-00 Swansea 2 - 1 Manchester United",
+      "half": 2,
+      "time": 1147.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Blinding. | But a very good chance from Sigurdsson again. | Blinding."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 695.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "who has the ball, of course, | but who has already conceded two clear chances. | Pancev with Santi Kassarla."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 773.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It\u2019s because he can hit, it\u2019s because he can cross too. | He tries to block his near post, but Vardy did it well. | It\u2019s both hitting very hard and very precisely."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 1085.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "He does what he can by spreading his long legs Schmeichel. | But Walcott shows a lot of technical finesse and precision in scoring. | Well done Walcott."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 1,
+      "time": 2031.2,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "He's still a lot slower, Mertesacker. | Alexis Sanchez, Jean-Luc who scored his first goal. | We said it earlier, the first of his 16 goals"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-26 - 17-00 Leicester 2 - 5 Arsenal",
+      "half": 2,
+      "time": 664.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Oulbryton center, all these centers are easily taken by Mertezacker from the enemy coach. | But be careful it benefits Havardi, perhaps! | Trappe de Schlupp, no worries, finally the slightest worry for a Pochec fact."
+     }
+    ]
+   },
+   "missed_events": 125
+  },
+  "n_gt_events": 637
+ },
+ "test": {
+  "segment_argmax": {
+   "accuracy": 0.8705685245169217,
+   "macro_f1": 0.3015060433639703,
+   "highlight_precision": 0.0505043526323062,
+   "highlight_recall": 0.15778113533347723,
+   "highlight_f1": 0.07651645993614904,
+   "highlight_macro_f1": 0.09154735842561564,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.9696296976323016,
+     "recall": 0.8960373895204454,
+     "f1": 0.9313820981790343,
+     "support": 129662
+    },
+    "Goal": {
+     "precision": 0.028275135704447864,
+     "recall": 0.1943207126948775,
+     "f1": 0.04936699908055732,
+     "support": 1796
+    },
+    "Card": {
+     "precision": 0.35096153846153844,
+     "recall": 0.13904761904761906,
+     "f1": 0.19918144611186903,
+     "support": 2625
+    },
+    "Penalty": {
+     "precision": 0.015582034830430797,
+     "recall": 0.08018867924528301,
+     "f1": 0.026093630084420567,
+     "support": 212
+    }
+   },
+   "confusion_matrix": [
+    [
+     116182,
+     11779,
+     671,
+     1030
+    ],
+    [
+     1428,
+     349,
+     4,
+     15
+    ],
+    [
+     2048,
+     183,
+     365,
+     29
+    ],
+    [
+     163,
+     32,
+     0,
+     17
+    ]
+   ]
+  },
+  "segment_thresholded": {
+   "accuracy": 0.8705685245169217,
+   "macro_f1": 0.3015060433639703,
+   "highlight_precision": 0.0505043526323062,
+   "highlight_recall": 0.15778113533347723,
+   "highlight_f1": 0.07651645993614904,
+   "highlight_macro_f1": 0.09154735842561564,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.9696296976323016,
+     "recall": 0.8960373895204454,
+     "f1": 0.9313820981790343,
+     "support": 129662
+    },
+    "Goal": {
+     "precision": 0.028275135704447864,
+     "recall": 0.1943207126948775,
+     "f1": 0.04936699908055732,
+     "support": 1796
+    },
+    "Card": {
+     "precision": 0.35096153846153844,
+     "recall": 0.13904761904761906,
+     "f1": 0.19918144611186903,
+     "support": 2625
+    },
+    "Penalty": {
+     "precision": 0.015582034830430797,
+     "recall": 0.08018867924528301,
+     "f1": 0.026093630084420567,
+     "support": 212
+    }
+   },
+   "confusion_matrix": [
+    [
+     116182,
+     11779,
+     671,
+     1030
+    ],
+    [
+     1428,
+     349,
+     4,
+     15
+    ],
+    [
+     2048,
+     183,
+     365,
+     29
+    ],
+    [
+     163,
+     32,
+     0,
+     17
+    ]
+   ]
+  },
+  "segment_balanced_argmax": {
+   "accuracy": 0.5268724368659616,
+   "macro_f1": 0.31798720077728354,
+   "highlight_precision": 0.49525745257452575,
+   "highlight_recall": 0.15778113533347723,
+   "highlight_f1": 0.23931903748567687,
+   "highlight_macro_f1": 0.20122407311773252,
+   "per_class": {
+    "No-Event": {
+     "precision": 0.5328626444159178,
+     "recall": 0.8959637383984459,
+     "f1": 0.6682765837559365,
+     "support": 4633
+    },
+    "Goal": {
+     "precision": 0.3546747967479675,
+     "recall": 0.1943207126948775,
+     "f1": 0.2510791366906475,
+     "support": 1796
+    },
+    "Card": {
+     "precision": 0.9170854271356784,
+     "recall": 0.13904761904761906,
+     "f1": 0.24148197155143902,
+     "support": 2625
+    },
+    "Penalty": {
+     "precision": 0.18085106382978725,
+     "recall": 0.08018867924528301,
+     "f1": 0.1111111111111111,
+     "support": 212
+    }
+   },
+   "confusion_matrix": [
+    [
+     4151,
+     420,
+     29,
+     33
+    ],
+    [
+     1428,
+     349,
+     4,
+     15
+    ],
+    [
+     2048,
+     183,
+     365,
+     29
+    ],
+    [
+     163,
+     32,
+     0,
+     17
+    ]
+   ]
+  },
+  "event": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.039685089974293056,
+    "recall": 0.8344594594594594,
+    "f1": 0.07576687116564415,
+    "tp": 247,
+    "fp": 5977,
+    "fn": 49
+   },
+   "Card": {
+    "precision": 0.3944055944055944,
+    "recall": 0.6997518610421837,
+    "f1": 0.5044722719141324,
+    "tp": 282,
+    "fp": 433,
+    "fn": 121
+   },
+   "Penalty": {
+    "precision": 0.02909090909090909,
+    "recall": 0.6857142857142857,
+    "f1": 0.05581395348837209,
+    "tp": 24,
+    "fp": 801,
+    "fn": 11
+   },
+   "overall": {
+    "precision": 0.07122617207624936,
+    "recall": 0.7534059945504087,
+    "f1": 0.1301482701812191,
+    "tp": 553,
+    "fp": 7211,
+    "fn": 181
+   },
+   "macro_f1": 0.2120176988560495
+  },
+  "event_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.020335412784574253,
+    "recall": 0.847972972972973,
+    "f1": 0.039718332146530574,
+    "tp": 251,
+    "fp": 12092,
+    "fn": 45
+   },
+   "Card": {
+    "precision": 0.27692307692307694,
+    "recall": 0.7146401985111662,
+    "f1": 0.3991683991683992,
+    "tp": 288,
+    "fp": 752,
+    "fn": 115
+   },
+   "Penalty": {
+    "precision": 0.021998166819431713,
+    "recall": 0.6857142857142857,
+    "f1": 0.04262877442273535,
+    "tp": 24,
+    "fp": 1067,
+    "fn": 11
+   },
+   "overall": {
+    "precision": 0.03889733314909493,
+    "recall": 0.7670299727520435,
+    "f1": 0.07403997895844293,
+    "tp": 563,
+    "fp": 13911,
+    "fn": 171
+   },
+   "macro_f1": 0.1605051685792217
+  },
+  "event_argmax_no_nms": {
+   "tolerance": 30.0,
+   "Goal": {
+    "precision": 0.020335412784574253,
+    "recall": 0.847972972972973,
+    "f1": 0.039718332146530574,
+    "tp": 251,
+    "fp": 12092,
+    "fn": 45
+   },
+   "Card": {
+    "precision": 0.27692307692307694,
+    "recall": 0.7146401985111662,
+    "f1": 0.3991683991683992,
+    "tp": 288,
+    "fp": 752,
+    "fn": 115
+   },
+   "Penalty": {
+    "precision": 0.021998166819431713,
+    "recall": 0.6857142857142857,
+    "f1": 0.04262877442273535,
+    "tp": 24,
+    "fp": 1067,
+    "fn": 11
+   },
+   "overall": {
+    "precision": 0.03889733314909493,
+    "recall": 0.7670299727520435,
+    "f1": 0.07403997895844293,
+    "tp": 563,
+    "fp": 13911,
+    "fn": 171
+   },
+   "macro_f1": 0.1605051685792217
+  },
+  "fp_diagnosis": {
+   "n_detections": 7764,
+   "n_false_positives": 7211,
+   "groups": {
+    "replay_recall": {
+     "count": 3106,
+     "share": 0.43073082790181666
+    },
+    "keyword_no_event": {
+     "count": 3072,
+     "share": 0.4260158091804188
+    },
+    "time_offset": {
+     "count": 624,
+     "share": 0.08653446123977257
+    },
+    "wrong_class": {
+     "count": 301,
+     "share": 0.041741783386492856
+    },
+    "duplicate": {
+     "count": 108,
+     "share": 0.014977118291499098
+    }
+   },
+   "examples": {
+    "keyword_no_event": [
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 110.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It is incredible to think that he has had no weight at Manchester United. | But that's how it was. | Excluding the first month and a half in which he did very well."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 140.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Real Madrid has not seen the real Di Mar\u00eda in this first season. | But I'm sure I'll end up performing a lot on this team. | I want to give everything for United."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 192.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "He avoided the loss. | But it's a ball for United. | Ashley Young."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 241.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Having the ball more than United. | Alexis who has scored 16 goals. | This season."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 328.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Jonathan Evans is a good substitute. | Yes, he is a good substitute but not a first-class starter. | In a team like Madrid."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 456.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It is very important, Blind plays with a positional midfielder who is further back, he looks at the centre-backs, there we have the play, we see it clearly there. | And of course, Fellaini, especially Ander Herrera, also Fellaini, but more Ander Herrera, even some of Juan Mata comes to help. | It is"
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 505.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "One for one with Beller\u00edn. | Asli Young's cross, far post, was looking for, it falls a little short, but good action by Asli Young. | Koscielny cleared."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 536.0,
+      "cls": "Card",
+      "confidence": 0.9,
+      "text": "Corner kick. | The Red Devils. | To the left of the goal, David Osfina."
+     }
+    ],
+    "duplicate": [
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 1785.5,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It just ends at pleasure. | Alexis doesn't want to come, but that's it. | Alexis swings very late. I think Alexis takes a long time to react."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 2221.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Valdez logically diverts the trajectory completely. | He's a crosser. He's not even going to shoot on goal. | And the detour that makes it impossible."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 1759.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "As the rain teams from the skies. | And Chelsea have found their goal touch again. | Do you know, John, that's the first time this season I've seen them"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 2,
+      "time": 840.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "or whether that's going to somebody else. | Once he turns around and sees it in the back of the net, he's delighted. | Game on again now."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-29 - 17-00 Liverpool 0 - 3 West Ham",
+      "half": 1,
+      "time": 1722.7,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "With Liverpool playing full-backs narrow and stuff like that. | But this is ridiculous. | Just deal with it and get back to your centre half position."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-29 - 17-00 Liverpool 0 - 3 West Ham",
+      "half": 2,
+      "time": 2801.4,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "We talked about them being low in confidence and how goals change games, they do, certainly they do. | But even though they were 2-0 up, there were times they could have gone 3-4, | but now to get the third goal, what an incredible result."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-20 - 18-00 Southampton 2 - 3 Manchester United",
+      "half": 1,
+      "time": 777.8,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Hard to say it's a wonderful reaction save from De Gea, | but Pellis following up, | and United's midfield too haven't come to terms with Mane yet."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-09-20 - 18-00 Southampton 2 - 3 Manchester United",
+      "half": 1,
+      "time": 2063.7,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "He gets back on. | It's a wonderful tackle from Hichida, but it falls to Martial. | I have to say, it's wonderful composure."
+     }
+    ],
+    "time_offset": [
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 1820.4,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "A change of record, right? At Arsenal probably, we hope, right? | New 6 in the League and 2 that he scored in the FA Cup. | 8 goals which is not bad for Ander Herrera. United beat Arsenal 1-0."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 2255.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Well, it's a tie at one. | Blackett at own goal. | Really, just tying one of the two would be enough."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 1,
+      "time": 1903.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "And City deserved it overall. | We've only played 31 minutes when he's scored. | Five chances."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 1,
+      "time": 2833.0,
+      "cls": "Card",
+      "confidence": 0.9,
+      "text": "...be down to the nine men that they were when Eden Hazard came off late in the Swansea game. | Of course, Courtois having been sent off. | "
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 2073.2,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Whether that's added to the goals, I don't know. | But it's a vital moment for him, a jubilant captain again. | Back early, put in a bit extra, and football can reward you."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 2311.4,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "They never rule out the defending champions. | Chelsea desperately need to score one quickly | to give themselves a chance at a second."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 742.0,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "McManaman goes over. | Matip gets his penalty. | Chelsea concede a penalty."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 843.0,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "You just keep driving him back. | But that's a poor penalty. | I think James Morrison is better than that."
+     }
+    ],
+    "replay_recall": [
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 1897.7,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "And Sunderland is risking relegation. And the draw against Sunderland already saves them. | But the tie, we would have to look at the goal difference if it is worth it or not for Arsenal. | Now United has more than 26, let's see."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 1956.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Of course yes. | We will see that game on Wednesday too, but it will be at Sunderland so important. | Also."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 2003.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Against Newcastle, I remember, the two games Newcastle and Palace away were very similar. | He scores and he already backs down to defend it. | They both win, but they suffer."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 2067.1,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Let's see the play first. | The one with the goal, right? | The one with the goal, yes."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 2100.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "It's the same article that... | I may be getting ahead of myself, but... | What you have read, I have read."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 2130.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "They face what they call the non-Champions, that is, what they call the picture of the big countries and the small countries. | But you're still going to have a big one. | That's why there was a Naples, let him tell you."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 2197.3,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "This season has been a disaster. | And the last one too, but this one has been an absolute disaster for the English teams in Europe. | However, Italy is doing very well."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 1,
+      "time": 2234.4,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "At the moment, no sign of Arsenal. | Valencia wants to take advantage of this phase, United, to score the second. | Looks to overwhelm the center of Valencia, penalty spot."
+     }
+    ],
+    "wrong_class": [
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 2198.9,
+      "cls": "Card",
+      "confidence": 0.9,
+      "text": "Walcott's cross hits a United defender. | I don't know if it was red. Now we'll see in the replay. | Jones and something in Blackett."
+     },
+     {
+      "game": "england_epl/2014-2015/2015-05-17 - 18-00 Manchester United 1 - 1 Arsenal",
+      "half": 2,
+      "time": 3014.9,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Almost, almost assured third place for the Gunner team. | Yes, one point will be enough for him, unless he scores a really difficult win. | That is, if we wanted, no, the last HAL game, or that Arsenal had been beaten at home by West Brom, the game, right?"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 119.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "John Terry is the type that will want to come out and watch his team-mates, | but I think he got treatment, he's really... | Must be injured."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 2125.4,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "Tripping him, trying to stay with him. | He was matching him to pace, but he was struggling with the body strength. | Yayao was just at a yard, he was just stepping across in the arm."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-16 - 18-00 Manchester City 3 - 0 Chelsea",
+      "half": 2,
+      "time": 2754.4,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "you have a couple of weeks where you may be resting and recovering, | but then for the last two weeks before you come back in you're starting to think about preparing yourself, | you're in the gym, you're doing runs, you're swimming, you're doing the weights,"
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 763.0,
+      "cls": "Goal",
+      "confidence": 0.9,
+      "text": "McManaman's ducking back. | He's going away from goal. | Stay on your feet."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 958.0,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "That's Matich again on McManaman. | The last one cost a penalty. | This one will cost a yellow card."
+     },
+     {
+      "game": "england_epl/2015-2016/2015-08-23 - 15-30 West Brom 2 - 3 Chelsea",
+      "half": 1,
+      "time": 2097.0,
+      "cls": "Penalty",
+      "confidence": 0.9,
+      "text": "That's more like it. | Makes up in part for the penalty miss and puts the baggies back in business. | That all stemmed actually from that little slip by Kurt Zouma."
+     }
+    ]
+   },
+   "missed_events": 181
+  },
+  "n_gt_events": 734
+ },
+ "pr_curves_valid": {
+  "Goal": [
+   [
+    0.05,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.1,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.15,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.2,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.25,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.3,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.35,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.4,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.45,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.5,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.55,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.6,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.65,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.7,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.75,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.8,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.85,
+    0.045987376014427414,
+    0.8762886597938144
+   ],
+   [
+    0.9,
+    0.0,
+    0.0
+   ],
+   [
+    0.95,
+    0.0,
+    0.0
+   ]
+  ],
+  "Card": [
+   [
+    0.05,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.1,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.15,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.2,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.25,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.3,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.35,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.4,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.45,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.5,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.55,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.6,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.65,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.7,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.75,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.8,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.85,
+    0.39408866995073893,
+    0.7570977917981072
+   ],
+   [
+    0.9,
+    0.0,
+    0.0
+   ],
+   [
+    0.95,
+    0.0,
+    0.0
+   ]
+  ],
+  "Penalty": [
+   [
+    0.05,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.1,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.15,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.2,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.25,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.3,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.35,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.4,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.45,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.5,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.55,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.6,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.65,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.7,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.75,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.8,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.85,
+    0.02361111111111111,
+    0.5862068965517241
+   ],
+   [
+    0.9,
+    0.0,
+    0.0
+   ],
+   [
+    0.95,
+    0.0,
+    0.0
+   ]
+  ]
+ }
+}

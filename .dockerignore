@@ -1,0 +1,10 @@
+data/
+outputs/
+checkpoints/
+notebooks/
+docs/
+tests/
+.git/
+**/__pycache__/
+*.egg-info/
+.venv/

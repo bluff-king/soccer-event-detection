@@ -1,0 +1,27 @@
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/delays_xlmr_s42.yaml > outputs/local/logs/v3_delays_xlmr_s42.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/views_hardneg_xlmr_s42.yaml > outputs/local/logs/v3_views_hardneg_xlmr_s42.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/views_hardneg_roberta_s42.yaml > outputs/local/logs/v3_views_hardneg_roberta_s42.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/all_roberta_s42.yaml > outputs/local/logs/v3_all_roberta_s42.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/summarize_seeds.py "outputs/local/v3/*" --out docs/results/v3_seeds.md > outputs/local/logs/v3_seeds.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/delays_xlmr_s1.yaml > outputs/local/logs/v3_delays_xlmr_s1.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/views_hardneg_xlmr_s1.yaml > outputs/local/logs/v3_views_hardneg_xlmr_s1.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/views_hardneg_roberta_s1.yaml > outputs/local/logs/v3_views_hardneg_roberta_s1.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/all_roberta_s1.yaml > outputs/local/logs/v3_all_roberta_s1.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/summarize_seeds.py "outputs/local/v3/*" --out docs/results/v3_seeds.md > outputs/local/logs/v3_seeds.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/delays_xlmr_s2.yaml > outputs/local/logs/v3_delays_xlmr_s2.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/views_hardneg_xlmr_s2.yaml > outputs/local/logs/v3_views_hardneg_xlmr_s2.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/views_hardneg_roberta_s2.yaml > outputs/local/logs/v3_views_hardneg_roberta_s2.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/run_experiments.py configs/local/v3/all_roberta_s2.yaml > outputs/local/logs/v3_all_roberta_s2.log 2>&1
+.venv/Scripts/python scripts/prune_checkpoints.py "outputs/local/*" "outputs/local/v3/*" "outputs/local/_archive/*" >> outputs/local/logs/prune.log 2>&1
+.venv/Scripts/python scripts/summarize_seeds.py "outputs/local/v3/*" --out docs/results/v3_seeds.md > outputs/local/logs/v3_seeds.log 2>&1

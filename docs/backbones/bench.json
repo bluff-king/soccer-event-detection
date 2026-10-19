@@ -1,0 +1,369 @@
+{
+ "FacebookAI/xlm-roberta-base": {
+  "amp_dtype": "fp16",
+  "tokens_per_window_mean": 33.8,
+  "tokens_per_window_p95": 61,
+  "params_m": 278.0,
+  "embedding_params_m": 192.0,
+  "train_frozen_emb": {
+   "samples_per_s": 136.1,
+   "peak_gb": 3.47
+  },
+  "train_full": {
+   "samples_per_s": 9.2,
+   "peak_gb": 5.26
+  },
+  "finetune_freeze_embeddings": true,
+  "finetune": {
+   "train_s": 116.4,
+   "final_loss_mean50": 0.6114,
+   "infer_windows_per_s": 1139.7,
+   "valid_subset": {
+    "accuracy": 0.6197,
+    "macro_f1": 0.2703,
+    "highlight_f1": 0.1955,
+    "highlight_macro_f1": 0.1097
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.752,
+    "Goal": 0.0,
+    "Card": 0.3292,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "jhu-clsp/mmBERT-base": {
+  "amp_dtype": "bf16",
+  "tokens_per_window_mean": 31.9,
+  "tokens_per_window_p95": 58,
+  "params_m": 307.5,
+  "embedding_params_m": 196.6,
+  "train_frozen_emb": {
+   "samples_per_s": 8.2,
+   "peak_gb": 4.64
+  },
+  "train_full": {
+   "samples_per_s": 4.8,
+   "peak_gb": 6.11
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 4774.7,
+   "final_loss_mean50": 0.5158,
+   "infer_windows_per_s": 716.2,
+   "valid_subset": {
+    "accuracy": 0.6489,
+    "macro_f1": 0.3788,
+    "highlight_f1": 0.3154,
+    "highlight_macro_f1": 0.2496
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7665,
+    "Goal": 0.3277,
+    "Card": 0.3534,
+    "Penalty": 0.0676
+   }
+  }
+ },
+ "FacebookAI/roberta-base": {
+  "amp_dtype": "fp16",
+  "tokens_per_window_mean": 32.8,
+  "tokens_per_window_p95": 60,
+  "params_m": 124.6,
+  "embedding_params_m": 38.6,
+  "train_frozen_emb": {
+   "samples_per_s": 147.1,
+   "peak_gb": 2.89
+  },
+  "train_full": {
+   "samples_per_s": 135.8,
+   "peak_gb": 3.18
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 125.3,
+   "final_loss_mean50": 0.543,
+   "infer_windows_per_s": 1262.7,
+   "valid_subset": {
+    "accuracy": 0.6598,
+    "macro_f1": 0.3749,
+    "highlight_f1": 0.3502,
+    "highlight_macro_f1": 0.2424
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7724,
+    "Goal": 0.282,
+    "Card": 0.4451,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "vinai/bertweet-base": {
+  "amp_dtype": "fp16",
+  "tokens_per_window_mean": 33.1,
+  "tokens_per_window_p95": 60,
+  "params_m": 134.9,
+  "embedding_params_m": 49.2,
+  "train_frozen_emb": {
+   "samples_per_s": 140.6,
+   "peak_gb": 2.94
+  },
+  "train_full": {
+   "samples_per_s": 132.8,
+   "peak_gb": 3.3
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 136.6,
+   "final_loss_mean50": 0.5559,
+   "infer_windows_per_s": 1024.4,
+   "valid_subset": {
+    "accuracy": 0.6425,
+    "macro_f1": 0.3406,
+    "highlight_f1": 0.2851,
+    "highlight_macro_f1": 0.1991
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.765,
+    "Goal": 0.2339,
+    "Card": 0.3634,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "microsoft/deberta-v3-base": {
+  "amp_dtype": "bf16",
+  "tokens_per_window_mean": 31.5,
+  "tokens_per_window_p95": 57,
+  "params_m": 184.4,
+  "embedding_params_m": 98.4,
+  "train_frozen_emb": {
+   "samples_per_s": 22.3,
+   "peak_gb": 4.9
+  },
+  "train_full": {
+   "samples_per_s": 13.3,
+   "peak_gb": 5.28
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 1781.2,
+   "final_loss_mean50": NaN,
+   "infer_windows_per_s": 691.4,
+   "valid_subset": {
+    "accuracy": 0.5767,
+    "macro_f1": 0.1829,
+    "highlight_f1": 0.0,
+    "highlight_macro_f1": 0.0
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7315,
+    "Goal": 0.0,
+    "Card": 0.0,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "answerdotai/ModernBERT-base": {
+  "amp_dtype": "bf16",
+  "tokens_per_window_mean": 33.1,
+  "tokens_per_window_p95": 60,
+  "params_m": 149.6,
+  "embedding_params_m": 38.7,
+  "train_frozen_emb": {
+   "samples_per_s": 12.8,
+   "peak_gb": 4.07
+  },
+  "train_full": {
+   "samples_per_s": 8.3,
+   "peak_gb": 4.34
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 1699.2,
+   "final_loss_mean50": 0.5546,
+   "infer_windows_per_s": 683.7,
+   "valid_subset": {
+    "accuracy": 0.6287,
+    "macro_f1": 0.3004,
+    "highlight_f1": 0.2358,
+    "highlight_macro_f1": 0.1483
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7565,
+    "Goal": 0.0905,
+    "Card": 0.3517,
+    "Penalty": 0.0028
+   }
+  }
+ },
+ "jhu-clsp/ettin-encoder-150m": {
+  "amp_dtype": "bf16",
+  "tokens_per_window_mean": 33.1,
+  "tokens_per_window_p95": 60,
+  "params_m": 149.6,
+  "embedding_params_m": 38.7,
+  "train_frozen_emb": {
+   "samples_per_s": 17.5,
+   "peak_gb": 4.08
+  },
+  "train_full": {
+   "samples_per_s": 11.5,
+   "peak_gb": 4.37
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 1634.7,
+   "final_loss_mean50": 0.5625,
+   "infer_windows_per_s": 691.5,
+   "valid_subset": {
+    "accuracy": 0.6205,
+    "macro_f1": 0.2807,
+    "highlight_f1": 0.2,
+    "highlight_macro_f1": 0.1233
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7527,
+    "Goal": 0.0595,
+    "Card": 0.3105,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "answerdotai/ModernBERT-base@adamw8bit": {
+  "amp_dtype": "bf16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 33.1,
+  "tokens_per_window_p95": 60,
+  "params_m": 149.6,
+  "embedding_params_m": 38.7,
+  "train_frozen_emb": {
+   "samples_per_s": 94.3,
+   "peak_gb": 3.42
+  },
+  "train_full": {
+   "samples_per_s": 91.1,
+   "peak_gb": 3.52
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 187.7,
+   "final_loss_mean50": 0.5871,
+   "infer_windows_per_s": 736.0,
+   "valid_subset": {
+    "accuracy": 0.6182,
+    "macro_f1": 0.2687,
+    "highlight_f1": 0.189,
+    "highlight_macro_f1": 0.1078
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7511,
+    "Goal": 0.0071,
+    "Card": 0.3165,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "jhu-clsp/ettin-encoder-150m@adamw8bit": {
+  "amp_dtype": "bf16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 33.1,
+  "tokens_per_window_p95": 60,
+  "params_m": 149.6,
+  "embedding_params_m": 38.7,
+  "train_frozen_emb": {
+   "samples_per_s": 95.3,
+   "peak_gb": 3.42
+  },
+  "train_full": {
+   "samples_per_s": 91.8,
+   "peak_gb": 3.5
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 187.8,
+   "final_loss_mean50": 0.5549,
+   "infer_windows_per_s": 734.4,
+   "valid_subset": {
+    "accuracy": 0.6263,
+    "macro_f1": 0.2989,
+    "highlight_f1": 0.2233,
+    "highlight_macro_f1": 0.1466
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7555,
+    "Goal": 0.1208,
+    "Card": 0.3191,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "microsoft/deberta-v3-base@adamw8bit": {
+  "amp_dtype": "bf16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 31.5,
+  "tokens_per_window_p95": 57,
+  "params_m": 184.4,
+  "embedding_params_m": 98.4,
+  "train_frozen_emb": {
+   "samples_per_s": 21.7,
+   "peak_gb": 4.73
+  },
+  "train_full": {
+   "samples_per_s": 24.3,
+   "peak_gb": 4.92
+  },
+  "finetune_freeze_embeddings": true,
+  "finetune": {
+   "train_s": 996.3,
+   "final_loss_mean50": 0.6127,
+   "infer_windows_per_s": 837.9,
+   "valid_subset": {
+    "accuracy": 0.5767,
+    "macro_f1": 0.1829,
+    "highlight_f1": 0.0,
+    "highlight_macro_f1": 0.0
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7315,
+    "Goal": 0.0,
+    "Card": 0.0,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "FacebookAI/roberta-base@adamw8bit": {
+  "amp_dtype": "fp16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 32.8,
+  "tokens_per_window_p95": 60,
+  "params_m": 124.6,
+  "embedding_params_m": 38.6,
+  "train_frozen_emb": {
+   "samples_per_s": 140.9,
+   "peak_gb": 2.42
+  },
+  "train_full": {
+   "samples_per_s": 139.3,
+   "peak_gb": 2.47
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 122.0,
+   "final_loss_mean50": 0.5373,
+   "infer_windows_per_s": 1388.1,
+   "valid_subset": {
+    "accuracy": 0.6634,
+    "macro_f1": 0.3882,
+    "highlight_f1": 0.3648,
+    "highlight_macro_f1": 0.2592
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.775,
+    "Goal": 0.3383,
+    "Card": 0.4394,
+    "Penalty": 0.0
+   }
+  }
+ }
+}

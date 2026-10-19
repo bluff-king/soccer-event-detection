@@ -1,0 +1,9 @@
+# backbone mdeberta-v3-base
+_base_: ../base.yaml
+output_dir: outputs/imp_mdeberta
+run_name: imp_mdeberta
+model:
+  name: microsoft/mdeberta-v3-base
+train:
+  lr: 3.0e-5
+  fp16: false   # mDeBERTa-v3 is unstable in fp16; ~1.6x slower
