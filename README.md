@@ -228,11 +228,14 @@ Nhận xét:
   hơn `data_hardneg`: các nguồn không cộng dồn.
 - **Làm mượt + NMS 45 s** cho +0.021 / +0.011 mà không tốn chi phí train nào.
 - **CE có trọng số** đổi precision lấy recall (R 0.647, P 0.330), F1 không tăng.
-- **Số của `imp_class_delays` trên Colab không hợp lệ (lỗi đã sửa).** Cửa sổ độ trễ được áp lúc *prepare*, nhưng
-  config này dùng chung `data/processed` với baseline: model train trên nhãn [-5, 15] cũ, còn lúc suy luận thời điểm
-  Penalty lại bị trừ độ trễ kỳ vọng mới (−27.5 s thay vì +5 s), nên mọi dự đoán Penalty lệch ~32 s, vượt ngưỡng
-  ±30 s → Penalty F1 = 0. Nay mỗi `processed_dir` ghi lại thiết lập gán nhãn và báo lỗi khi config không khớp. Chạy
-  lại đúng cách (mục 5.3), cửa sổ theo lớp là cải tiến lớn nhất cho Penalty.
+- **`imp_class_delays` trên Colab không thử cái nó ghi (lỗi đã sửa).** Cửa sổ độ trễ được áp lúc *prepare*, nhưng
+  config này dùng chung `data/processed` với baseline, nên model vẫn train trên nhãn [-5, 15]; chỉ phần quy đổi thời
+  điểm sự kiện dùng độ trễ mới (Penalty −27.5 s thay vì +5 s). Nay mỗi `processed_dir` ghi lại thiết lập gán nhãn và
+  báo lỗi khi config không khớp. Chạy lại đúng cách (mục 5.3), cửa sổ theo lớp là cải tiến lớn nhất cho Penalty.
+  *Vì sao Penalty F1 = 0 thì chưa xác định được*: độ trễ lệch **không** phải nguyên nhân (tái hiện trên xác suất
+  của `v2_baseline`, cũng train trên [-5, 15]: độ trễ −27.5 s cho Penalty F1 test 0.235, cao hơn 0.118 với +5 s, vì
+  bình luận penalty diễn ra trước cú sút). Ứng viên còn lại là checkpoint epoch 0 chưa học được Penalty; không kiểm
+  được vì không còn output Colab. Xem [`docs/loi/2026-10-13_class-delays-dung-chung-du-lieu.html`](docs/loi/2026-10-13_class-delays-dung-chung-du-lieu.html).
 - **Hai tầng** (0.484 / 0.481) có lợi so với baseline nhưng không hơn model đơn `data_hardneg`: verifier loại mất
   quá nhiều sự kiện đúng (recall stage 1 0.885 còn 0.513).
 - **Gộp các nguồn tốt không cộng dồn.** `final` (hardneg + caption + synthetic + làm mượt) đạt 0.502 / 0.468, thấp
@@ -501,6 +504,8 @@ tests/              căn chỉnh nhãn, cửa sổ, chia theo trận, nguồn d�
 Dữ liệu (`data/`), checkpoint và `outputs/` không được commit (xem `.gitignore`).
 
 ## 10. Hạn chế và việc còn lại
+
+Các lỗi đã gặp (triệu chứng, nguyên nhân gốc, chẩn đoán sai nếu có, bài học) ở [`docs/LESSONS.md`](docs/LESSONS.md); mỗi mục có một trang hình dựng từ dữ liệu thật trong `docs/loi/`.
 
 - Repo baseline gốc không tìm thấy, nên mốc 72.4 % / 0.67 không tái hiện được trên cùng tập đánh giá. Cột `bal_*`
   chỉ là phép so sánh gần đúng.

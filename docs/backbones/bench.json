@@ -229,5 +229,141 @@
     "Penalty": 0.0
    }
   }
+ },
+ "answerdotai/ModernBERT-base@adamw8bit": {
+  "amp_dtype": "bf16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 33.1,
+  "tokens_per_window_p95": 60,
+  "params_m": 149.6,
+  "embedding_params_m": 38.7,
+  "train_frozen_emb": {
+   "samples_per_s": 94.3,
+   "peak_gb": 3.42
+  },
+  "train_full": {
+   "samples_per_s": 91.1,
+   "peak_gb": 3.52
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 187.7,
+   "final_loss_mean50": 0.5871,
+   "infer_windows_per_s": 736.0,
+   "valid_subset": {
+    "accuracy": 0.6182,
+    "macro_f1": 0.2687,
+    "highlight_f1": 0.189,
+    "highlight_macro_f1": 0.1078
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7511,
+    "Goal": 0.0071,
+    "Card": 0.3165,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "jhu-clsp/ettin-encoder-150m@adamw8bit": {
+  "amp_dtype": "bf16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 33.1,
+  "tokens_per_window_p95": 60,
+  "params_m": 149.6,
+  "embedding_params_m": 38.7,
+  "train_frozen_emb": {
+   "samples_per_s": 95.3,
+   "peak_gb": 3.42
+  },
+  "train_full": {
+   "samples_per_s": 91.8,
+   "peak_gb": 3.5
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 187.8,
+   "final_loss_mean50": 0.5549,
+   "infer_windows_per_s": 734.4,
+   "valid_subset": {
+    "accuracy": 0.6263,
+    "macro_f1": 0.2989,
+    "highlight_f1": 0.2233,
+    "highlight_macro_f1": 0.1466
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7555,
+    "Goal": 0.1208,
+    "Card": 0.3191,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "microsoft/deberta-v3-base@adamw8bit": {
+  "amp_dtype": "bf16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 31.5,
+  "tokens_per_window_p95": 57,
+  "params_m": 184.4,
+  "embedding_params_m": 98.4,
+  "train_frozen_emb": {
+   "samples_per_s": 21.7,
+   "peak_gb": 4.73
+  },
+  "train_full": {
+   "samples_per_s": 24.3,
+   "peak_gb": 4.92
+  },
+  "finetune_freeze_embeddings": true,
+  "finetune": {
+   "train_s": 996.3,
+   "final_loss_mean50": 0.6127,
+   "infer_windows_per_s": 837.9,
+   "valid_subset": {
+    "accuracy": 0.5767,
+    "macro_f1": 0.1829,
+    "highlight_f1": 0.0,
+    "highlight_macro_f1": 0.0
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.7315,
+    "Goal": 0.0,
+    "Card": 0.0,
+    "Penalty": 0.0
+   }
+  }
+ },
+ "FacebookAI/roberta-base@adamw8bit": {
+  "amp_dtype": "fp16",
+  "optimizer": "adamw8bit",
+  "tokens_per_window_mean": 32.8,
+  "tokens_per_window_p95": 60,
+  "params_m": 124.6,
+  "embedding_params_m": 38.6,
+  "train_frozen_emb": {
+   "samples_per_s": 140.9,
+   "peak_gb": 2.42
+  },
+  "train_full": {
+   "samples_per_s": 139.3,
+   "peak_gb": 2.47
+  },
+  "finetune_freeze_embeddings": false,
+  "finetune": {
+   "train_s": 122.0,
+   "final_loss_mean50": 0.5373,
+   "infer_windows_per_s": 1388.1,
+   "valid_subset": {
+    "accuracy": 0.6634,
+    "macro_f1": 0.3882,
+    "highlight_f1": 0.3648,
+    "highlight_macro_f1": 0.2592
+   },
+   "valid_subset_f1": {
+    "No-Event": 0.775,
+    "Goal": 0.3383,
+    "Card": 0.4394,
+    "Penalty": 0.0
+   }
+  }
  }
 }
